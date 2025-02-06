@@ -1,0 +1,20 @@
+@import "tailwindcss";
+*{
+  box-sizing: border-box;
+  /* font-family: "DM Serif Text", serif;
+  font-weight: 400;
+  font-style: normal; */
+}
+body{
+  background-color: #212121;
+  color: #ffff;
+}
+.bg-main{
+  background-color: #171717;
+  color: #ffff;
+
+}
+.bg-content{
+  background-color: #303030;
+  color: white;
+}
