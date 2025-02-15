@@ -47,7 +47,7 @@ const productSchema = new Schema(
         ref: "Category",
       },
     ],
-    productSize: [
+    product_size: [
       {
         size: {
           type: Schema.Types.ObjectId,
@@ -80,7 +80,7 @@ const productSchema = new Schema(
       type: String,
       default: null,
     },
-    superOffer: {
+    super_offer: {
       type: Boolean,
       default: false,
     },

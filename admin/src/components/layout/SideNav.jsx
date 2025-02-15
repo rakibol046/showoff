@@ -103,8 +103,7 @@ export default function SideNavigationSeparator() {
         </Link>
         <nav
           aria-label="side navigation"
-          className="flex-1 divide-y  overflow-auto"
-          style={{ borderColor: "red" }}
+          className="flex-1 divide-y divide-[#454545] overflow-auto"
         >
           <div>
             <ul className="flex flex-1 flex-col gap-1 py-3">
@@ -154,7 +153,7 @@ export default function SideNavigationSeparator() {
             </ul>
           </div>
         </nav>
-        <footer className="border-t border-red-100 p-3">
+        <footer className="border-t border-[#454545] p-3">
           <Link
             to="#"
             className="flex items-center gap-3 rounded p-3  transition-colors hover:text-emerald-500 "
