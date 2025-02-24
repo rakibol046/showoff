@@ -1,33 +1,34 @@
 import { useEffect, useState } from "react";
-import CreateBtn from "../common/CreateBTN";
-import ShowTitle from "../common/ShowTitle";
+import CreateBtn from "../../components/common/CreateBTN";
+import ShowTitle from "../../components/common/ShowTitle";
 
-const Products = () => {
+const Category = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:8080/admin_api/product/all");
+        const response = await fetch(
+          "http://localhost:8080/admin_api/product/all"
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch products");
         }
         const data = await response.json();
         setProducts(data);
-        console.log(data)
+        console.log(data);
       } catch (err) {
-        console.log(err)
-      } 
+        console.log(err);
+      }
     };
 
     fetchProducts();
   }, []);
 
-
   return (
     <>
       <div className="bg-content flex justify-between items-center rounded-md p-2 mb-4">
-        <ShowTitle name="Products" />
+        {/* <ShowTitle name="Products" /> */}
         <div className="relative">
           <input
             id="id-s03"
@@ -55,12 +56,10 @@ const Products = () => {
             />
           </svg>
         </div>
-        <CreateBtn name="Add Product" />
+        <CreateBtn name="Create Category" />
       </div>
 
       <main>
-     
-
         <div className="w-full overflow-x-auto shadow-amber-400">
           <table
             className="w-full text-left border-collapse  rounded w-overflow-x-auto bg-content"
@@ -68,60 +67,42 @@ const Products = () => {
           >
             <tbody>
               <tr className="border-b border-slate-300">
-                <th
-                  scope="col"
-                  className="h-12 px-6"
-                >
+                <th scope="col" className="h-12 px-6">
                   Product Name
                 </th>
-                <th
-                  scope="col"
-                  className="h-12 px-6"
-                >
-                   Code
+                <th scope="col" className="h-12 px-6">
+                  Code
                 </th>
-                <th
-                  scope="col"
-                  className="h-12 px-6"
-                >
+                <th scope="col" className="h-12 px-6">
                   Sell Price
                 </th>
-                <th
-                  scope="col"
-                  className="h-12 px-6 "
-                >
+                <th scope="col" className="h-12 px-6 ">
                   Stock
                 </th>
-                <th
-                  scope="col"
-                  className="h-12 px-6 text-right"
-                >
+                <th scope="col" className="h-12 px-6 text-right">
                   Action
                 </th>
               </tr>
               {products.map((product) => (
                 <tr className="border-b border-[#454545]">
-                <td className="h-12 px-6  transition duration-300">
-                  {product?.name}
-                </td>
-                <td className="h-12 px-6 transition duration-300">
-                {product?.product_code}
-                </td>
-                <td className="h-12 px-6  transition duration-300">
-                {product?.sell_price}
-                </td>
-                <td className="h-12 px-6  transition duration-300  ">
-                {product?.stock}
-                </td>
-                <td className="h-12 px-6  transition duration-300 text-right">
-                <button className="bg-green-900 p-2 mr-2">View</button>
-                <button className="bg-yellow-900 p-2 mr-2">Update</button>
-                <button className="bg-red-900 p-2">Delete</button>
-                </td>
-              </tr>
+                  <td className="h-12 px-6  transition duration-300">
+                    {product?.name}
+                  </td>
+                  <td className="h-12 px-6 transition duration-300">
+                    {product?.product_code}
+                  </td>
+                  <td className="h-12 px-6  transition duration-300">
+                    {product?.sell_price}
+                  </td>
+                  <td className="h-12 px-6  transition duration-300  ">
+                    {product?.stock}
+                  </td>
+                  <td className="h-12 px-6  transition duration-300 text-right">
+                    <button className="bg-yellow-900 p-2 mr-2">Update</button>
+                    <button className="bg-red-900 p-2">Delete</button>
+                  </td>
+                </tr>
               ))}
-              
-            
             </tbody>
           </table>
         </div>
@@ -129,4 +110,4 @@ const Products = () => {
     </>
   );
 };
-export default Products;
+export default Category;
