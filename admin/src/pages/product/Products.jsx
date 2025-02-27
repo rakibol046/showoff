@@ -70,7 +70,7 @@ const Products = () => {
                 </th>
               </tr>
               {products.map((product) => (
-                <tr className="border-b border-[#454545]">
+                <tr key={product._id} className="border-b border-[#454545]">
                   <td className="h-12 px-6  transition duration-300">
                     {product?.name}
                   </td>

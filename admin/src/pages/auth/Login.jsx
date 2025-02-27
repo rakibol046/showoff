@@ -1,30 +1,32 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import logo from "../../assets/images/logo.svg";
+import { useSignInMutation } from "../../features/auth/authApi";
+import { useNavigate } from "react-router";
 
 export default function Login() {
-  // const [formData, setFormData] = useState({
-  //   email: "",
-  //   password: "",
-  // });
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData({ ...formData, [name]: value });
-  // };
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   console.log(formData);
-  // };
-
+  const [signIn, { data: auth, isSuccess, error: resError, isLoading }] =
+    useSignInMutation();
+  let navigate = useNavigate();
+  const [error, setError] = useState("");
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm();
+  useEffect(() => {
+    if (resError) {
+      console.log(resError);
+      setError(resError?.data?.message);
+    }
+    if (isSuccess) {
+      navigate("/");
+    }
+  }, [auth, resError]);
+
   const onSubmit = (data) => {
-    console.log(data);
-  }
+    signIn(data);
+  };
 
   return (
     <>
@@ -43,16 +45,20 @@ export default function Login() {
         >
           {/*        <!-- Modal header --> */}
           <header id="header-4a" className="flex items-center">
-           <img className="mb-3" src={logo} />
+            <img className="mb-3" src={logo} />
           </header>
+
+          <div className="error-massage text-center text-red-500">{error}</div>
           {/*        <!-- Modal body --> */}
           <form onSubmit={handleSubmit(onSubmit)} className="flex-1">
             <div className="flex flex-col gap-6">
               {/*                <!-- Input field --> */}
               <div className="relative">
                 <input
-                  {...register("email")}
-                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                  {...register("email", {
+                    required: true,
+                    pattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i,
+                  })}
                   type="email"
                   placeholder="Email"
                   required
@@ -80,6 +86,7 @@ export default function Login() {
             <div className="flex justify-center gap-2 mt-4">
               <button
                 type="submit"
+                disabled={isLoading}
                 className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
               >
                 <span>Login</span>

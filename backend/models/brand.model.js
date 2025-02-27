@@ -1,20 +1,23 @@
-const mongoose =require('mongoose')
+const mongoose = require("mongoose");
 
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema;
 
-const brandSchema = new Schema ({
-    name:{
-        type:String,
-        required:true,
+const brandSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
     },
-    logo_url:{
-        type:String,
-        default:null,
+    logo_url: {
+      type: String,
+      default: null,
     },
-    status:{
-        type:Boolean,
-        default:true,
-    }
-})
+    status: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Brand', brandSchema)
+module.exports = mongoose.model("Brand", brandSchema);

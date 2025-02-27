@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { NavLink, Link, useLocation } from "react-router";
+import { useDispatch } from "react-redux";
+import { NavLink, Link, useLocation, useNavigate } from "react-router";
 import logo from "../assets/images/logo.png";
 import home from "../assets/icons/home.svg";
 import orders from "../assets/icons/orders.svg";
@@ -10,6 +11,7 @@ import size from "../assets/icons/size.svg";
 import colors from "../assets/icons/colors.svg";
 import userIcon from "../assets/icons/users.svg";
 import logout from "../assets/icons/logout.svg";
+import { adminLogOut } from "../features/auth/authSlice";
 
 const menuItem = [
   {
@@ -21,28 +23,36 @@ const menuItem = [
     name: "Orders",
     icon: orders,
     url: "/orders",
+    child: [],
   },
   {
     name: "Products",
     icon: products,
     url: "/products",
+    // child: [
+    //   {
+    //     name: "Own",
+    //     icon: category,
+    //     url: "/own-products",
+    //   },
+    // ],
   },
   {
     name: "Categories",
     icon: category,
     url: "/categories",
-    child: [
-      {
-        name: "Main Categories",
-        icon: category,
-        url: "/categories",
-      },
-      {
-        name: "Sub Categories",
-        icon: category,
-        url: "/sub-categories",
-      },
-    ],
+    // child: [
+    //   {
+    //     name: "Main Categories",
+    //     icon: category,
+    //     url: "/categories",
+    //   },
+    //   {
+    //     name: "Sub Categories",
+    //     icon: category,
+    //     url: "/sub-categories",
+    //   },
+    // ],
   },
   {
     name: "Brand",
@@ -63,6 +73,15 @@ const menuItem = [
 export default function SideNavigationSeparator() {
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
   const location = useLocation();
+  let navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const logOut = () => {
+    dispatch(adminLogOut());
+    localStorage.removeItem("auth");
+    navigate("/login");
+  };
 
   return (
     <>
@@ -119,11 +138,11 @@ export default function SideNavigationSeparator() {
             <ul className="flex flex-1 flex-col gap-1 py-3">
               {menuItem.map((item, index) => (
                 <div>
-                  {item?.child ? (
+                  {item?.child?.length > 0 ? (
                     <details className="group px-3 font-medium rounded">
                       <summary
                         className={`relative hover:bg-[#303030] rounded p-3 flex justify-center items-center gap-3 cursor-pointer list-none pr-8 font-medium  transition-colors duration-300 focus-visible:outline-none  [&::-webkit-details-marker]:hidden ${
-                          location.pathname === "/categories" ||
+                          location.pathname === item.url ||
                           location.pathname === "/sub-categories"
                             ? "bg-[#303030]"
                             : ""
@@ -210,8 +229,8 @@ export default function SideNavigationSeparator() {
           </div>
         </nav>
         <footer className="border-t border-[#454545] p-3">
-          <Link
-            to="#"
+          <button
+            onClick={logOut}
             className="flex items-center gap-3 rounded p-3  transition-colors hover:text-emerald-500 "
           >
             <div className="flex items-center self-center ">
@@ -220,7 +239,7 @@ export default function SideNavigationSeparator() {
             <div className="flex w-full flex-1 flex-col items-start justify-center gap-0 overflow-hidden truncate text-sm font-medium">
               Logout
             </div>
-          </Link>
+          </button>
         </footer>
       </aside>
 

@@ -1,18 +1,19 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const colorSchema = new Schema(
+const productSizeSchema = new Schema(
   {
     name: {
       type: String,
       required: true,
     },
-    value: {
-      type: String,
+    category_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
       required: true,
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Color", colorSchema);
+module.exports = mongoose.model("ProductSize", productSizeSchema);

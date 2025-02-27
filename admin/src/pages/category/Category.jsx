@@ -1,34 +1,19 @@
 import { useEffect, useState } from "react";
 import CreateBtn from "../../components/common/CreateBTN";
 import ShowTitle from "../../components/common/ShowTitle";
+import { useGetCategoriesQuery } from "../../features/categories/categoriesApi";
+import { Link } from "react-router";
 
 const Category = () => {
-  const [products, setProducts] = useState([]);
+  const { data: categories, error, isLoading } = useGetCategoriesQuery();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:8080/admin_api/product/all"
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch products");
-        }
-        const data = await response.json();
-        setProducts(data);
-        console.log(data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchProducts();
-  }, []);
+  if (isLoading) return <p>Loading categories...</p>;
+  if (error) return <p>Error loading categories!</p>;
 
   return (
     <>
       <div className="bg-content flex justify-between items-center rounded-md p-2 mb-4">
-        {/* <ShowTitle name="Products" /> */}
+        {/* <ShowTitle name="categories" /> */}
         <div className="relative">
           <input
             id="id-s03"
@@ -56,7 +41,9 @@ const Category = () => {
             />
           </svg>
         </div>
-        <CreateBtn name="Create Category" />
+        <Link to={"/categories/add"}>
+          <CreateBtn name="Create Category" />
+        </Link>
       </div>
 
       <main>
@@ -68,34 +55,30 @@ const Category = () => {
             <tbody>
               <tr className="border-b border-slate-300">
                 <th scope="col" className="h-12 px-6">
-                  Product Name
+                  Category
                 </th>
                 <th scope="col" className="h-12 px-6">
-                  Code
+                  Type
                 </th>
-                <th scope="col" className="h-12 px-6">
-                  Sell Price
-                </th>
+
                 <th scope="col" className="h-12 px-6 ">
-                  Stock
+                  Status
                 </th>
                 <th scope="col" className="h-12 px-6 text-right">
                   Action
                 </th>
               </tr>
-              {products.map((product) => (
-                <tr className="border-b border-[#454545]">
+              {categories.map((category) => (
+                <tr key={category._id} className="border-b border-[#454545]">
                   <td className="h-12 px-6  transition duration-300">
-                    {product?.name}
+                    {category?.name}
                   </td>
                   <td className="h-12 px-6 transition duration-300">
-                    {product?.product_code}
+                    {category?.type == 1 ? "Parent" : "Subcategory"}
                   </td>
-                  <td className="h-12 px-6  transition duration-300">
-                    {product?.sell_price}
-                  </td>
+
                   <td className="h-12 px-6  transition duration-300  ">
-                    {product?.stock}
+                    {category?.status === true ? "Active" : "Deactive"}
                   </td>
                   <td className="h-12 px-6  transition duration-300 text-right">
                     <button className="bg-yellow-900 p-2 mr-2">Update</button>

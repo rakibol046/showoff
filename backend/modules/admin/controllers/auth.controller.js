@@ -19,7 +19,7 @@ exports.adminLogin = async (req, res) => {
       throw new Error("Invalid password, try again!");
     }
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       {
         id: admin._id,
         email: email,
@@ -30,7 +30,8 @@ exports.adminLogin = async (req, res) => {
 
     res.status(200).json({
       message: "Sign-in successful",
-      token,
+      accessToken,
+      admin,
       expiresIn: new Date(Date.now() + 24 * 2 * 60 * 60),
       error: false,
     });
@@ -42,6 +43,7 @@ exports.adminLogin = async (req, res) => {
     });
   }
 };
+
 exports.getProfile = async (req, res) => {
   try {
     const admin_id = req.adminData.id;

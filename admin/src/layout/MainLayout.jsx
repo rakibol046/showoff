@@ -1,10 +1,13 @@
 import SideNav from "./SideNav";
 import TopNav from "./Top";
 
-function MainLayout() {
-    return(
+function MainLayout({ children }) {
+  return (
     <>
-        <SideNav />
-        <TopNav />
-    </>);
-} export default MainLayout;
+      <SideNav />
+      <TopNav />
+      <main className="lg:ml-72 p-5">{children}</main>
+    </>
+  );
+}
+export default MainLayout;
