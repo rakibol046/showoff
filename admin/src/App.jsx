@@ -15,13 +15,13 @@ export default function App() {
   const authCheck = useAuthCheck();
   return !authCheck ? (
     <>
-      <div>Checking auth....</div>
+      <div>Checking auth.... chondro bindo builders</div>
     </>
   ) : (
     <>
-      <MainLayout>
-        <Routes>
-          <Route path="login" element={<Login />} />
+      <Routes>
+        <Route path="login" element={<Login />} />
+        <MainLayout>
           <Route index element={<Home />} />
           <Route path="products" element={<Products />} />
           {/* <Route path="categories" element={<Category />} />
@@ -30,8 +30,8 @@ export default function App() {
             <Route index element={<Category />} />
             <Route path="add" element={<CreateCategory />} />
           </Route>
-        </Routes>
-      </MainLayout>
+        </MainLayout>
+      </Routes>
     </>
   );
 }

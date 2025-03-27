@@ -31,7 +31,10 @@ exports.adminLogin = async (req, res) => {
     res.status(200).json({
       message: "Sign-in successful",
       accessToken,
-      admin,
+      admin: {
+        email: admin.email,
+        name: admin.name,
+      },
       expiresIn: new Date(Date.now() + 24 * 2 * 60 * 60),
       error: false,
     });
@@ -46,9 +49,10 @@ exports.adminLogin = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   try {
+    console.log("profile fatch");
     const admin_id = req.adminData.id;
 
-    let data = await Admin.findById(admin_id);
+    let data = await Admin.findById(admin_id).select("name email");
 
     if (!data) {
       throw new Error("Admin not found!");
