@@ -19,9 +19,10 @@ export default function App() {
     </>
   ) : (
     <>
-      <Routes>
-        <Route path="login" element={<Login />} />
-        <MainLayout>
+      <MainLayout>
+        <Routes>
+          <Route path="login" element={<Login />} />
+
           <Route index element={<Home />} />
           <Route path="products" element={<Products />} />
           {/* <Route path="categories" element={<Category />} />
@@ -30,8 +31,8 @@ export default function App() {
             <Route index element={<Category />} />
             <Route path="add" element={<CreateCategory />} />
           </Route>
-        </MainLayout>
-      </Routes>
+        </Routes>
+      </MainLayout>
     </>
   );
 }
