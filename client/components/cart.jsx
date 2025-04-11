@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +15,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 
-export function Cart() {
+export default function Cart() {
   const [goal, setGoal] = React.useState(350);
 
   function onClick(adjustment) {
@@ -25,9 +25,10 @@ export function Cart() {
   return (
     <Drawer direction="right">
       <DrawerTrigger asChild>
-        <Button variant="outline">
+        <div>
           <ShoppingCart />
-        </Button>
+          {/* <Heart /> */}
+        </div>
       </DrawerTrigger>
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">

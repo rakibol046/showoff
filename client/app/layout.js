@@ -2,6 +2,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header";
+import { ModeToggle } from "@/components/mode-toggle";
+import Footer from "@/components/footer";
+import HeaderTop from "@/components/header-top";
+import HeaderMobile from "@/components/header-mobile";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,11 +34,19 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          <header className="">
+          <HeaderTop />
+          <div className="sticky top-0 hidden lg:block">
             <Header />
-          </header>
+          </div>
+          <div className="mobile-header sticky top-0 lg:hidden">
+            <HeaderMobile />
+          </div>
+
           <main> {children}</main>
-          <footer className="bg-amber-500 p-24 m-24 rounded-2xl">footer</footer>
+          <Footer />
+          <div className="actions fixed bottom-6 right-6">
+            <ModeToggle />
+          </div>
         </ThemeProvider>
       </body>
     </html>
