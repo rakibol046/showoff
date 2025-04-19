@@ -34,17 +34,15 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          <HeaderTop />
-          <div className="sticky top-0 hidden lg:block">
-            <Header />
-          </div>
-          <div className="mobile-header sticky top-0 lg:hidden">
-            <HeaderMobile />
-          </div>
+          {/* <HeaderTop /> */}
+
+          <Header />
+
+          <HeaderMobile />
 
           <main> {children}</main>
           <Footer />
-          <div className="actions fixed bottom-6 right-6">
+          <div className="actions z-50 fixed bottom-6 right-6">
             <ModeToggle />
           </div>
         </ThemeProvider>
