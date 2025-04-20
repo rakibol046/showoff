@@ -18,7 +18,7 @@ import logo from "@/public/images/logo.svg";
 import logoDark from "@/public/images/logo-dark.svg";
 function Footer() {
   return (
-    <div className="px-4 md:px-8 lg:px-12  bg-white dark:bg-black mt-24">
+    <div className="px-4 md:px-8 lg:px-12  bg-white dark:bg-black">
       <div className="h-56 flex justify-center items-center">
         <Image
           src={logo}

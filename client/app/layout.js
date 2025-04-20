@@ -1,20 +1,22 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Asul, Poppins } from "next/font/google";
 import "@/styles/globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import Header from "@/components/header";
-import { ModeToggle } from "@/components/mode-toggle";
-import Footer from "@/components/footer";
-import HeaderTop from "@/components/header-top";
-import HeaderMobile from "@/components/header-mobile";
+import { ThemeProvider } from "@/components/common/theme-provider";
+import Header from "@/components/header/header";
+import { ModeToggle } from "@/components/common/mode-toggle";
+import Footer from "@/components/footer/footer";
+import HeaderTop from "@/components/header/header-top";
+import HeaderMobile from "@/components/header/header-mobile";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const asul = Asul({
   subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-asul",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const poppins = Poppins({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
 });
 
 export const metadata = {
@@ -24,10 +26,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiase`}
-      >
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`font-[poppins] antialiase`}
+    >
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

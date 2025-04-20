@@ -31,7 +31,7 @@ export default function Header() {
 
   return (
     <div
-      className={`sticky top-0 left-0 hidden lg:block w-full z-50 px-12 transition-all duration-300 items-center ${
+      className={`sticky top-0 left-0 hidden lg:block w-full z-50 px-12  transition-all duration-300  items-center ${
         isHome
           ? isScrolled
             ? "bg-white dark:bg-black shadow-sm"

@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export default function HeaderMobile() {
   return (
-    <div className="px-4 md:px-8 shadow-sm bg-white dark:bg-black sticky top-0 left-0 lg:hidden">
+    <div className="px-4 md:px-8 z-50 shadow-sm bg-white dark:bg-black sticky top-0 left-0 lg:hidden">
       {/* <hr className="my-2" /> */}
       <div className="flex justify-between items-center h-[65px]">
         <Menu />

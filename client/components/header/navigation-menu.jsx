@@ -127,7 +127,7 @@ export function Menu() {
       <NavigationMenuList>
         {categories?.map((cat) =>
           cat?.subcat.length > 0 ? (
-            <NavigationMenuItem>
+            <NavigationMenuItem key={cat._id}>
               <NavigationMenuTrigger>
                 <span className="font-bold">{cat.title}</span>
               </NavigationMenuTrigger>

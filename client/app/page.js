@@ -1,51 +1,13 @@
 import Image from "next/image";
 
-import Slider from "@/components/slider";
+import Slider from "@/components/home/slider";
+import NewArrival from "@/components/home/new-arrival";
 export default function Home() {
   return (
     <div>
       <Slider />
 
-      <h1>hi</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
-      <h1>Home page</h1>
+      <NewArrival />
     </div>
   );
 }
