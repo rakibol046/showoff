@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`font-[poppins] antialiase`}
+      className={`${asul.variable} ${poppins.variable} antialiase`}
     >
       <body>
         <ThemeProvider

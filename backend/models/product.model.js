@@ -1,95 +1,73 @@
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 const Schema = mongoose.Schema;
 
-const productSchema = new Schema(
+// Variant Schema
+const variantSchema = new Schema(
   {
-    product_code: {
-      type: String,
-      default: "",
+    size: {
+      type: Schema.Types.ObjectId,
+      ref: "ProductSize",
     },
-    bar_code: {
-      type: String,
-      default: "",
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    status: {
-      type: Boolean,
-      default: true,
-    },
-    thumbnail: {
-      type: String,
-      default: null,
-    },
-    product_images: [
-      {
-        type: String,
-      },
-    ],
-    product_video: {
-      type: String,
-      default: "",
-    },
-    buy_price: {
-      type: Number,
-      default: 0,
+    color: {
+      type: Schema.Types.ObjectId,
+      ref: "Color",
     },
     sell_price: {
       type: Number,
       required: true,
       default: 0,
     },
-    category_id: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Category",
-      },
-    ],
-    product_size: [
-      {
-        size: {
-          type: Schema.Types.ObjectId,
-          ref: "ProductSize",
-        },
-        sell_price: {
-          type: Number,
-          required: true,
-          default: 0,
-        },
-      },
-    ],
-
-    product_color: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Color",
-        default: "",
-      },
-    ],
-    discount: {
+    stock: {
       type: Number,
       default: 0,
     },
-    stock: {
-      type: Number,
-      default: 1,
-    },
-    description: {
-      type: String,
-      default: null,
-    },
-    super_offer: {
-      type: Boolean,
-      default: false,
-    },
-    slug: {
+    sku: {
       type: String,
       default: "",
     },
+    image: {
+      type: String,
+      default: null,
+    },
+  },
+  { _id: false }
+);
+
+// Product Schema
+const productSchema = new Schema(
+  {
+    product_code: { type: String, default: "" },
+    bar_code: { type: String, default: "" },
+    name: { type: String, required: true },
+    status: { type: Boolean, default: true },
+    thumbnail: { type: String, default: null },
+    product_images: [{ type: String }],
+    product_video: { type: String, default: "" },
+    buy_price: { type: Number, default: 0 },
+    sell_price: { type: Number, default: 0 },
+    discount: { type: Number, default: 0 },
+    category_id: [{ type: Schema.Types.ObjectId, ref: "Category" }],
+    description: { type: String, default: null },
+    super_offer: { type: Boolean, default: false },
+    slug: { type: String, default: "" },
+
+    // Variants
+    variants: [variantSchema],
   },
   { timestamps: true }
 );
+
+// Auto-generate slug from name
+productSchema.pre("save", function (next) {
+  if (!this.slug && this.name) {
+    this.slug = slugify(this.name, {
+      lower: true,
+      strict: true,
+      replacement: "-",
+    });
+  }
+  next();
+});
 
 module.exports = mongoose.model("Product", productSchema);

@@ -1,96 +1,193 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import { useState } from "react";
 import CreateBtn from "../../components/common/CreateBTN";
 import ShowTitle from "../../components/common/ShowTitle";
 import { useGetCategoriesQuery } from "../../features/categories/categoriesApi";
-import { Link } from "react-router";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+const ITEMS_PER_PAGE = 10;
 
 const Category = () => {
-  const { data: categories, error, isLoading } = useGetCategoriesQuery();
+  const { data: categories = [], error, isLoading } = useGetCategoriesQuery();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  if (isLoading) return <p>Loading categories...</p>;
-  if (error) return <p>Error loading categories!</p>;
+  const filteredCategories = categories.filter((cat) =>
+    cat.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredCategories.length / ITEMS_PER_PAGE);
+  const paginatedCategories = filteredCategories.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
-    <>
-      <div className="bg-content flex justify-between items-center rounded-md p-2 mb-4">
-        {/* <ShowTitle name="categories" /> */}
-        <div className="relative">
-          <input
-            id="id-s03"
-            type="search"
-            name="id-s03"
-            placeholder="Search here"
-            aria-label="Search content"
-            className="peer relative h-10 w-full lg:w-96 rounded border border-white px-4 pr-12 text-sm  outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
-          />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="absolute right-4 top-2.5 h-5 w-5 cursor-pointer stroke-white peer-disabled:cursor-not-allowed"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            aria-hidden="true"
-            aria-label="Search icon"
-            role="graphics-symbol"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-            />
-          </svg>
-        </div>
-        <Link to={"/categories/add"}>
-          <CreateBtn name="Create Category" />
-        </Link>
-      </div>
+    <main className="">
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold">
+            Parent Category List
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <Skeleton className="w-full h-48" />
+          ) : error ? (
+            <p className="text-red-500">Error loading categories!</p>
+          ) : (
+            <>
+              <div className="mb-4 flex items-center gap-4 w-64">
+                <Input
+                  type="text"
+                  placeholder="Search category..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <ScrollArea className="w-full overflow-auto">
+                <Table className="min-w-[700px]">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedCategories.map((category) => (
+                      <TableRow key={category._id}>
+                        <TableCell>{category.name}</TableCell>
+                        <TableCell>
+                          {category.type === 1 ? "Parent" : "Subcategory"}
+                        </TableCell>
+                        <TableCell>
+                          {category.status === true ? "Active" : "Deactive"}
+                        </TableCell>
+                        <TableCell className="text-right space-x-2">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button variant="secondary" size="sm">
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Edit</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
 
-      <main>
-        <div className="w-full overflow-x-auto shadow-amber-400">
-          <table
-            className="w-full text-left border-collapse  rounded w-overflow-x-auto bg-content"
-            cellspacing="0"
-          >
-            <tbody>
-              <tr className="border-b border-slate-300">
-                <th scope="col" className="h-12 px-6">
-                  Category
-                </th>
-                <th scope="col" className="h-12 px-6">
-                  Type
-                </th>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>
+                                        Are you sure you want to delete this
+                                        category?
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        This action cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction>
+                                        Delete
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </TooltipTrigger>
+                              <TooltipContent>Delete</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
 
-                <th scope="col" className="h-12 px-6 ">
-                  Status
-                </th>
-                <th scope="col" className="h-12 px-6 text-right">
-                  Action
-                </th>
-              </tr>
-              {categories.map((category) => (
-                <tr key={category._id} className="border-b border-[#454545]">
-                  <td className="h-12 px-6  transition duration-300">
-                    {category?.name}
-                  </td>
-                  <td className="h-12 px-6 transition duration-300">
-                    {category?.type == 1 ? "Parent" : "Subcategory"}
-                  </td>
+              <Pagination className="mt-4">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                    />
+                  </PaginationItem>
 
-                  <td className="h-12 px-6  transition duration-300  ">
-                    {category?.status === true ? "Active" : "Deactive"}
-                  </td>
-                  <td className="h-12 px-6  transition duration-300 text-right">
-                    <button className="bg-yellow-900 p-2 mr-2">Update</button>
-                    <button className="bg-red-900 p-2">Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </main>
-    </>
+                  <PaginationItem>
+                    <span className="px-2 text-sm text-muted-foreground">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                  </PaginationItem>
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      disabled={currentPage === totalPages}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </main>
   );
 };
+
 export default Category;

@@ -25,7 +25,7 @@ export default function NewArrival() {
 
   return (
     <div className="bg-[#F9F4EF] dark:bg-background p-6 sm:p-8 lg:p-12">
-      <p className="font-[asul] text-3xl sm:text-4xl lg:text-5xl text-center mb-6">
+      <p className="font-asul text-3xl sm:text-4xl lg:text-5xl text-center mb-6">
         New Arrival
       </p>
 

@@ -1,6 +1,5 @@
-import { useNavigate, Routes, Route } from "react-router";
-import React, { useState, useRef, useEffect } from "react";
-// import api from "./api/api.js";
+import { Routes, Route, Navigate } from "react-router";
+import React from "react";
 import MainLayout from "./layout/MainLayout.jsx";
 import Home from "./pages/home/Home.jsx";
 import Products from "./pages/product/Products.jsx";
@@ -9,30 +8,48 @@ import Category from "./pages/category/Category.jsx";
 import CreateCategory from "./pages/category/CreateCategory.jsx";
 import useAuthCheck from "./hooks/useAuthCheck.js";
 import useAuth from "./hooks/useAuth.js";
+import HeroSlider from "./pages/hero-slider/HeroSlider.jsx";
 
 export default function App() {
-  let navigate = useNavigate();
-  const authCheck = useAuthCheck();
-  return !authCheck ? (
-    <>
-      <div>Checking auth.... chondro bindo builders</div>
-    </>
-  ) : (
-    <>
-      <MainLayout>
-        <Routes>
-          <Route path="login" element={<Login />} />
+  const authChecked = useAuthCheck();
+  const isLoggedIn = useAuth();
 
+  if (!authChecked) {
+    return <div>Checking auth...</div>;
+  }
+
+  return (
+    <Routes>
+      {/* Public route */}
+      <Route
+        path="/login"
+        element={!isLoggedIn ? <Login /> : <Navigate to="/" replace />}
+      />
+
+      {/* Protected routes, wrapped in MainLayout */}
+      {isLoggedIn && (
+        <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
+
+          {/* Product Routes */}
           <Route path="products" element={<Products />} />
-          {/* <Route path="categories" element={<Category />} />
-              <Route path="categories/add" element={<CreateCategory />} /> */}
-          <Route path="categories">
-            <Route index element={<Category />} />
-            <Route path="add" element={<CreateCategory />} />
-          </Route>
-        </Routes>
-      </MainLayout>
-    </>
+
+          {/* Categories Routes */}
+          <Route path="parent-categories" element={<Category />} />
+          <Route path="sub-categories" element={<Category />} />
+          <Route path="child-categories" element={<Category />} />
+          <Route path="category/add" element={<CreateCategory />} />
+
+          {/* Slider Routes */}
+          <Route path="sliders" element={<HeroSlider />} />
+          <Route path="slider/add" element={<CreateCategory />} />
+        </Route>
+      )}
+
+      {/* Fallback route for unauthorized access */}
+      {!isLoggedIn && (
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      )}
+    </Routes>
   );
 }

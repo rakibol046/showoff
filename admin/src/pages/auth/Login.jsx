@@ -3,8 +3,19 @@ import { useForm } from "react-hook-form";
 import logo from "../../assets/images/logo.svg";
 import { useSignInMutation } from "../../features/auth/authApi";
 import { useNavigate } from "react-router";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export default function Login() {
+export default function Login({ className, ...props }) {
   const [signIn, { data: auth, isSuccess, error: resError, isLoading }] =
     useSignInMutation();
   let navigate = useNavigate();
@@ -29,74 +40,65 @@ export default function Login() {
   };
 
   return (
-    <>
-      <div
-        className="fixed top-0 left-0 z-20 flex h-screen w-screen items-center justify-center bg-main backdrop-blur-sm"
-        aria-labelledby="header-4a content-4a"
-        aria-modal="true"
-        tabindex="-1"
-        role="dialog"
-      >
-        {/*    <!-- Modal --> */}
-        <div
-          className="flex max-h-[90vh] max-w-sm flex-col gap-4 overflow-hidden rounded bg-content p-6 shadow-xl"
-          id="modal"
-          role="document"
-        >
-          {/*        <!-- Modal header --> */}
-          <header id="header-4a" className="flex items-center">
-            <img className="mb-3" src={logo} />
-          </header>
-
-          <div className="error-massage text-center text-red-500">{error}</div>
-          {/*        <!-- Modal body --> */}
-          <form onSubmit={handleSubmit(onSubmit)} className="flex-1">
-            <div className="flex flex-col gap-6">
-              {/*                <!-- Input field --> */}
-              <div className="relative">
-                <input
-                  {...register("email", {
-                    required: true,
-                    pattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i,
-                  })}
-                  type="email"
-                  placeholder="Email"
-                  required
-                  className="peer relative h-10 w-full rounded border px-4  outline-none transition-all autofill:bg-white  focus:border-emerald-500 focus:outline-non disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
-                />
-                <small className="absolute flex w-full justify-between px-4 py-1 text-xs text-slate-400 transition">
-                  <span>Type your email address</span>
-                </small>
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <div className={cn("flex flex-col gap-6", className)} {...props}>
+          <Card>
+            <CardHeader>
+              <div className="m-auto">
+                <img src={logo} alt="logo" />
               </div>
-              {/*                <!-- Input field --> */}
-              <div className="relative my-6">
-                <input
-                  {...register("password")}
-                  type="password"
-                  placeholder="password"
-                  required
-                  className="peer relative h-10 w-full text-white rounded border  px-4 pr-12  outline-none transition-all autofill:bg-white  focus:border-emerald-500 focus:outline-none disabled:cursor-not-allowed "
-                />
-
-                <small className="absolute flex w-full justify-between px-4 py-1 text-xs text-slate-400 transition">
-                  <span>Type your password</span>
-                </small>
-              </div>
-            </div>
-            <div className="flex justify-center gap-2 mt-4">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
-              >
-                <span>Login</span>
-              </button>
-            </div>
-          </form>
-          {/*        <!-- Modal actions --> */}
+              <CardTitle className="text-2xl text-center">Login</CardTitle>
+              <CardDescription className="text-center">
+                Enter your email below to login to your account
+                <div className="error-massage text-center mt-2 text-red-500">
+                  {error}
+                </div>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="flex flex-col gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      {...register("email", {
+                        required: true,
+                        pattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i,
+                      })}
+                      id="email"
+                      type="email"
+                      placeholder="m@example.com"
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <div className="flex items-center">
+                      <Label htmlFor="password">Password</Label>
+                      <a
+                        href="#"
+                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                      >
+                        Forgot your password?
+                      </a>
+                    </div>
+                    <Input
+                      {...register("password")}
+                      id="password"
+                      type="password"
+                      placeholder="Enter Password"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full">
+                    Login
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
-      ,
-    </>
+    </div>
   );
 }
