@@ -47,6 +47,7 @@ const productSchema = new Schema(
     buy_price: { type: Number, default: 0 },
     sell_price: { type: Number, default: 0 },
     discount: { type: Number, default: 0 },
+    stock: { type: Number, default: 0 },
     category_id: [{ type: Schema.Types.ObjectId, ref: "Category" }],
     description: { type: String, default: null },
     super_offer: { type: Boolean, default: false },

@@ -1,153 +1,194 @@
-import { useEffect, useState } from "react";
-import CreateBtn from "../../components/common/CreateBTN";
-import ShowTitle from "../../components/common/ShowTitle";
+import { useState, useEffect } from "react";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
-  useGetParentCategoriesQuery,
-  useAddCategoryMutation,
-} from "../../features/categories/categoriesApi";
-import { useForm } from "react-hook-form";
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 
-const CreateCategory = () => {
-  const { data: categories, error, isLoading } = useGetParentCategoriesQuery();
-  const [addCategory, { isSuccess: isAddCategorySuccess }] =
-    useAddCategoryMutation();
-  console.log("hi ", categories);
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = useForm();
-  const onSubmit = (data) => {
-    addCategory(data);
-    console.log(data);
+export default function AddCategoryForm() {
+  const [type, setType] = useState(1); // 1 = Parent, 2 = Child
+  const [parentId, setParentId] = useState("");
+  const [name, setName] = useState("");
+  const [status, setStatus] = useState(true);
+  const [note, setNote] = useState("");
+  const [logoFile, setLogoFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [mainCategories, setMainCategories] = useState([]);
+
+  // Fetch main categories for child selection
+  useEffect(() => {
+    fetch("http://localhost:8080/admin_api/category/parent/all")
+      .then((res) => res.json())
+      .then((data) => setMainCategories(data))
+      .catch((err) => console.error(err));
+  }, []);
+
+  // Convert file to base64
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (err) => reject(err);
+    });
   };
 
-  if (isLoading) return <p>Loading categories...</p>;
-  if (error) return <p>Error loading categories!</p>;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    let logoBase64 = null;
+    if (logoFile) {
+      logoBase64 = await fileToBase64(logoFile);
+    }
+
+    const payload = {
+      type,
+      name,
+      status,
+      note,
+      parent_id: type === 2 ? parentId : null,
+      logo_url: logoBase64,
+    };
+
+    console.log("Payload to backend:", payload);
+
+    const res = await fetch("http://localhost:8080/admin_api/category/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (data.status === true) {
+      toast.success("Category has been created");
+    } else {
+      toast.error("Faild to create category");
+    }
+    console.log("Backend response:", data);
+
+    handleReset();
+  };
+
+  const handleReset = () => {
+    setType(1);
+    setParentId("");
+    setName("");
+    setStatus(true);
+    setNote("");
+    setLogoFile(null);
+    setImagePreview(null);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setLogoFile(file);
+    setImagePreview(file ? URL.createObjectURL(file) : null);
+  };
 
   return (
-    <>
-      <div>Create category</div>
+    <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
+      <h2 className="text-xl font-semibold mb-4">Add Category</h2>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="bg-content p-4 max-w-4xl m-auto rounded"
-      >
-        <div class="relative my-6">
-          <input
-            {...register("name")}
-            type="text"
-            placeholder="your name"
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* CATEGORY TYPE */}
+        <Field name="type">
+          <FieldLabel>Category Type</FieldLabel>
+          <Select
+            value={String(type)}
+            onValueChange={(v) => setType(Number(v))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">Parent</SelectItem>
+              <SelectItem value="2">Child</SelectItem>
+            </SelectContent>
+          </Select>
+          <FieldError />
+        </Field>
+
+        {/* PARENT CATEGORY (only for Child) */}
+        {type === 2 && (
+          <Field name="parent_id">
+            <FieldLabel>Parent Category</FieldLabel>
+            <Select value={parentId} onValueChange={setParentId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select parent" />
+              </SelectTrigger>
+              <SelectContent>
+                {mainCategories.map((cat) => (
+                  <SelectItem key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FieldError />
+          </Field>
+        )}
+
+        {/* NAME */}
+        <Field name="name">
+          <FieldLabel>Category Name</FieldLabel>
+          <Input
+            placeholder="Enter category name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
-            class="relative w-full h-12 px-4 placeholder-transparent transition-all border rounded outline-none focus-visible:outline-none peer border-slate-200  autofill:bg-amber-200 invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
           />
-          <label
-            for="id-l01"
-            class="cursor-text peer-focus:cursor-default peer-autofill:-top-2 absolute left-2 -top-2 z-[1] px-2 transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-[#303030] before:transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:"
-          >
-            Category name
-          </label>
-        </div>
+          <FieldError />
+        </Field>
 
-        <div className="relative my-6">
-          <select
-            {...register("type")}
-            required
-            className="peer relative h-12 w-full bg-content appearance-none rounded border border-slate-200 px-4  outline-none transition-all autofill:bg-red-200 focus:border-emerald-500 focus-visible:outline-none focus:focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+        {/* STATUS */}
+        <Field name="status">
+          <FieldLabel>Status</FieldLabel>
+          <Select
+            value={String(status)}
+            onValueChange={(v) => setStatus(v === "true")}
           >
-            <option value="" disabled selected></option>
-            <option value="1">Main category</option>
-            <option value="2">Sub category</option>
-          </select>
-          <label
-            for="id-10"
-            className="pointer-events-none absolute top-3 left-2 z-[1] px-2 text-base  transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-[#303030] before:transition-all peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-valid:-top-2 peer-valid:text-xs peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
-          >
-            Category type
-          </label>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="pointer-events-none absolute top-3.5 right-2 h-5 w-5 fill-slate-400 transition-all peer-focus:fill-emerald-500 peer-disabled:cursor-not-allowed"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-labelledby="title-10 description-10"
-            role="graphics-symbol"
-          >
-            <title id="title-10">Arrow Icon</title>
-            <desc id="description-10">Arrow icon of the select list.</desc>
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
+            <SelectTrigger>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="true">Active</SelectItem>
+              <SelectItem value="false">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
+          <FieldError />
+        </Field>
+
+        {/* NOTE */}
+        <Field name="note">
+          <FieldLabel>Note</FieldLabel>
+          <Textarea
+            placeholder="Optional note"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+          <FieldError />
+        </Field>
+
+        {/* LOGO */}
+        <Field name="logo_url">
+          <FieldLabel>Logo / Image</FieldLabel>
+          {/* <Input type="file" accept="image/*" onChange={handleFileChange} /> */}
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="mt-2 h-20 w-20 object-contain rounded"
             />
-          </svg>
-        </div>
-        <div className="relative my-6">
-          <select
-            {...register("parent_id")}
-            // required
-            className="peer relative h-12 w-full bg-content appearance-none rounded border border-slate-200 px-4  outline-none transition-all autofill:bg-red-200 focus:border-emerald-500 focus-visible:outline-none focus:focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
-          >
-            <option value="" disabled selected></option>
-            {categories.map((category) => (
-              <option key={category._id} value={category._id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-          <label
-            for="id-10"
-            className="pointer-events-none absolute top-3 left-2 z-[1] px-2 text-base  transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-[#303030] before:transition-all peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-valid:-top-2 peer-valid:text-xs peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
-          >
-            Parent category
-          </label>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="pointer-events-none absolute top-3.5 right-2 h-5 w-5 fill-slate-400 transition-all peer-focus:fill-emerald-500 peer-disabled:cursor-not-allowed"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-labelledby="title-10 description-10"
-            role="graphics-symbol"
-          >
-            <title id="title-10">Arrow Icon</title>
-            <desc id="description-10">Arrow icon of the select list.</desc>
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </div>
-        <div className="relative my-6">
-          <select
-            {...register("status")}
-            className="peer relative h-12 w-full bg-content appearance-none rounded border border-slate-200 px-4  outline-none transition-all autofill:bg-red-200 focus:border-emerald-500 focus-visible:outline-none focus:focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
-          >
-            <option value="true" selected>
-              Active
-            </option>
-            <option value="false">Deactive</option>
-          </select>
-          <label className="pointer-events-none absolute top-3 left-2 z-[1] px-2 text-base  transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-[#303030] before:transition-all peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-valid:-top-2 peer-valid:text-xs peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent">
-            Status
-          </label>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="pointer-events-none absolute top-3.5 right-2 h-5 w-5 fill-slate-400 transition-all peer-focus:fill-emerald-500 peer-disabled:cursor-not-allowed"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-labelledby="title-10 description-10"
-            role="graphics-symbol"
-          >
-            <title id="title-10">Arrow Icon</title>
-            <desc id="description-10">Arrow icon of the select list.</desc>
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </div>
+          )}
+          <FieldError />
+        </Field>
 
         <div className="relative my-6">
           <input
@@ -157,7 +198,9 @@ const CreateCategory = () => {
             className="peer hidden"
             accept=".gif,.jpg,.png,.jpeg"
             multiple
+            onChange={handleFileChange}
           />
+
           <label
             for="id-dropzone02"
             className="flex cursor-pointer flex-col items-center gap-6 rounded border border-dashed border-slate-300 px-6 py-10 text-center"
@@ -193,16 +236,21 @@ const CreateCategory = () => {
           </label>
         </div>
 
-        <div className="flex justify-center gap-2 mt-4">
-          <button
-            type="submit"
-            className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
+        {/* BUTTONS */}
+        <div className="flex gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={handleReset}
           >
-            <span>Create Category</span>
-          </button>
+            Reset
+          </Button>
+          <Button type="submit" className="flex-1">
+            Save Category
+          </Button>
         </div>
       </form>
-    </>
+    </div>
   );
-};
-export default CreateCategory;
+}

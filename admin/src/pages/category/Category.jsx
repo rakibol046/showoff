@@ -25,6 +25,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -43,12 +49,16 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-const ITEMS_PER_PAGE = 10;
+import { Plus } from "lucide-react";
+import { Link } from "react-router";
+
+const ITEMS_PER_PAGE = 12;
 
 const Category = () => {
   const { data: categories = [], error, isLoading } = useGetCategoriesQuery();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filter, setFilter] = useState("all");
 
   const filteredCategories = categories.filter((cat) =>
     cat.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -62,11 +72,42 @@ const Category = () => {
 
   return (
     <main className="">
-      <Card className="rounded-2xl">
+      <Card className="rounded-sm">
         <CardHeader>
-          <CardTitle className="text-xl font-bold">
-            Parent Category List
-          </CardTitle>
+          <CardTitle className="text-xl font-bold">Category List</CardTitle>
+          <div className="mt-4 flex justify-between">
+            <div className="flex flex-wrap gap-4 items-center">
+              <Input
+                type="text"
+                placeholder="Search category..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full sm:w-64"
+              />
+              <Select onValueChange={setFilter} defaultValue="all">
+                <SelectTrigger className="w-40">
+                  <span>
+                    {filter === "all"
+                      ? "All Categories"
+                      : filter === "parent"
+                      ? "Parent"
+                      : "Child"}
+                  </span>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="parent">Parent</SelectItem>
+                  <SelectItem value="child">Child</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Link to={`/add-category`}>
+              <Button variant="outline">
+                <Plus />
+                Add New Category
+              </Button>
+            </Link>
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -75,14 +116,6 @@ const Category = () => {
             <p className="text-red-500">Error loading categories!</p>
           ) : (
             <>
-              <div className="mb-4 flex items-center gap-4 w-64">
-                <Input
-                  type="text"
-                  placeholder="Search category..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
               <ScrollArea className="w-full overflow-auto">
                 <Table className="min-w-[700px]">
                   <TableHeader>
@@ -101,7 +134,7 @@ const Category = () => {
                           {category.type === 1 ? "Parent" : "Subcategory"}
                         </TableCell>
                         <TableCell>
-                          {category.status === true ? "Active" : "Deactive"}
+                          {category.status === true ? "Active" : "Inactive"}
                         </TableCell>
                         <TableCell className="text-right space-x-2">
                           <TooltipProvider>

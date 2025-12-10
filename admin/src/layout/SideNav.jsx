@@ -53,9 +53,10 @@ const menuItem = [
     icon: <List className="w-5 h-5" />,
     url: "/categories",
     child: [
-      { name: "Parent Categories", url: "/parent-categories" },
-      { name: "Sub Categories", url: "/sub-categories" },
-      { name: "Child Categories", url: "/child-categories" },
+      { name: "Categories", url: "/categories" },
+
+      // { name: "Child Categories", url: "/child-categories" },
+      { name: "Add Category", url: "/add-category" },
     ],
   },
   {

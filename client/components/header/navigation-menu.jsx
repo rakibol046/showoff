@@ -125,9 +125,9 @@ export function Menu() {
   return (
     <NavigationMenu>
       <NavigationMenuList>
-        {categories?.map((cat) =>
+        {categories?.map((cat, index) =>
           cat?.subcat.length > 0 ? (
-            <NavigationMenuItem key={cat._id}>
+            <NavigationMenuItem key={index}>
               <NavigationMenuTrigger>
                 <span className="font-bold">{cat.title}</span>
               </NavigationMenuTrigger>
@@ -150,12 +150,8 @@ export function Menu() {
                     </NavigationMenuLink>
                   </li>
                   <ul className="grid  gap-3 p-4  md:grid-cols-2 ">
-                    {cat?.subcat?.map((sub) => (
-                      <ListItem
-                        key={sub.title}
-                        title={sub.title}
-                        href={sub.href}
-                      >
+                    {cat?.subcat?.map((sub, index) => (
+                      <ListItem key={index} title={sub.title} href={sub.href}>
                         {sub.description}
                       </ListItem>
                     ))}
@@ -164,7 +160,7 @@ export function Menu() {
               </NavigationMenuContent>
             </NavigationMenuItem>
           ) : (
-            <NavigationMenuItem>
+            <NavigationMenuItem key={index}>
               <Link href="/docs" legacyBehavior passHref>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                   <span className="font-bold">{cat.title}</span>

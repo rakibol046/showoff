@@ -35,6 +35,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
+import Loader from "@/components/common/Loader";
 
 const Products = () => {
   const { data: products, error, isLoading } = useGetProductsQuery();
@@ -91,7 +92,7 @@ const Products = () => {
 
   return (
     <main className="">
-      <Card className="rounded-2xl">
+      <Card className="rounded-sm">
         <CardHeader>
           <CardTitle className="text-xl font-bold">Product List</CardTitle>
           <div className="mt-4 flex flex-wrap gap-4 items-center">

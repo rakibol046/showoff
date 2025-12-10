@@ -9,6 +9,7 @@ import CreateCategory from "./pages/category/CreateCategory.jsx";
 import useAuthCheck from "./hooks/useAuthCheck.js";
 import useAuth from "./hooks/useAuth.js";
 import HeroSlider from "./pages/hero-slider/HeroSlider.jsx";
+import CreateProduct from "./pages/product/CreateProduct.jsx";
 
 export default function App() {
   const authChecked = useAuthCheck();
@@ -33,12 +34,11 @@ export default function App() {
 
           {/* Product Routes */}
           <Route path="products" element={<Products />} />
+          <Route path="add-product" element={<CreateProduct />} />
 
           {/* Categories Routes */}
-          <Route path="parent-categories" element={<Category />} />
-          <Route path="sub-categories" element={<Category />} />
-          <Route path="child-categories" element={<Category />} />
-          <Route path="category/add" element={<CreateCategory />} />
+          <Route path="categories" element={<Category />} />
+          <Route path="add-category" element={<CreateCategory />} />
 
           {/* Slider Routes */}
           <Route path="sliders" element={<HeroSlider />} />

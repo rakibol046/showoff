@@ -18,6 +18,9 @@ const categorySchema = new Schema(
       type: Boolean,
       default: true,
     },
+    note: {
+      type: String,
+    },
     logo_url: {
       type: String,
       default: null,

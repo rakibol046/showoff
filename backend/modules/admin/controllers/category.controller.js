@@ -101,21 +101,28 @@ exports.deleteCategory = async (req, res) => {
 };
 exports.createCategory = async (req, res) => {
   try {
-    console.log("category creation route called");
-    const { type, name, logo_url, parent_id } = req.body;
+    console.log(req.body);
+    const { type, name, parent_id, note, status } = req.body;
+    const logo_url = req.file ? req.file.path : null; // multer puts file info in req.file
 
     const category = new Category({
-      type,
+      type: Number(type),
       name,
+      parent_id: parent_id || null,
       logo_url,
-      parent_id,
+      note,
+      status: status === "true" || status === true, // convert to boolean
     });
 
     await category.save();
     res
       .status(201)
-      .json({ message: "Category created successfully", category });
+      .json({
+        status: true,
+        message: "Category created successfully",
+        category,
+      });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ status: false, error: error.message });
   }
 };

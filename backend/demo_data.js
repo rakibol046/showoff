@@ -1,5 +1,4 @@
-
-const products = [
+const defaultProducts = [
   {
     product_code: "C1001",
     bar_code: "BARC1001",
@@ -210,5 +209,25 @@ const products = [
     slug: "womens-office-blazer",
   },
 ];
+const defaultSlider = [
+  {
+    name: "Slider1",
+    status: true,
+    image: "slider1.svg",
+    link: "http://localhost:3000/products",
+  },
+  {
+    name: "Slider2",
+    status: true,
+    image: "slider2.svg",
+    link: "http://localhost:3000/products",
+  },
+  {
+    name: "Slider3",
+    status: true,
+    image: "slider3.svg",
+    link: "http://localhost:3000/products",
+  },
+];
 
-module.exports = {products}
+module.exports = { defaultProducts, defaultSlider };

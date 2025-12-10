@@ -1,6 +1,7 @@
 import { Outlet } from "react-router";
 import SideNav from "./SideNav";
 import TopNav from "./Top";
+import { Toaster } from "@/components/ui/sonner";
 
 function MainLayout() {
   return (
@@ -14,6 +15,7 @@ function MainLayout() {
           <Outlet />
         </main>
       </div>
+      <Toaster />
     </div>
   );
 }
