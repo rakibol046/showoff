@@ -1,57 +1,45 @@
 import Details from "@/components/product/product-details/product-details";
+import { fetchProductBySlug } from "@/api/product.api";
+
+export async function generateMetadata({ params }) {
+  const { product_slug } = await params;
+  const product = await fetchProductBySlug(product_slug);
+
+  return {
+    title: `${product.name} | ShowOff`,
+    description: `Buy ${product.name} at the best price. Explore features, specifications, and more.`,
+    keywords: `${product.name}, buy ${product.name}, online shopping`,
+    canonical: `${process.env.NEXT_PUBLIC_API_BASE_URL}product/${product_slug}`,
+    openGraph: {
+      title: `${product.name} | ShowOff`,
+      description: `Buy ${product.name} at the best price. Explore features, specifications, and more.`,
+      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}product/${product_slug}`,
+      // type: "product",
+      images: [
+        {
+          url: product?.thumbnail,
+          width: 1200,
+          height: 630,
+          alt: product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${product.name} | ShowOff`,
+      description: `Buy ${product.name} at the best price. Explore features, specifications, and more.`,
+      images: [product?.thumbnail],
+    },
+  };
+}
 
 export default async function ProductDetails({ params }) {
   const { product_slug } = await params;
-  console.log(product_slug);
-  const exampleProduct = {
-    name: "Premium Cotton T-Shirt",
-    description:
-      "High-quality, breathable cotton T-shirt available in multiple colors and sizes.",
-    sell_price: 500,
-    discount: 10,
-    thumbnail: "/images/img6.webp",
-    product_images: [
-      "/images/img1.webp",
-      "/images/img2.webp",
-      "/images/img3.webp",
-    ],
-    variants: [
-      {
-        size: "M",
-        color: "Red",
-        sell_price: 500,
-        stock: 10,
-        image: "/images/img1.webp",
-      },
-      {
-        size: "L",
-        color: "Red",
-        sell_price: 520,
-        stock: 0,
-        image: "/images/img2.webp",
-      },
-      {
-        size: "XL",
-        color: "Blue",
-        sell_price: 510,
-        stock: 5,
-        image: "/images/img3.webp",
-      },
-      {
-        size: "2XL",
-        color: "Green",
-        sell_price: 530,
-        stock: 3,
-        image: "/images/img4.webp",
-      },
-    ],
-  };
+  const product = await fetchProductBySlug(product_slug);
 
   return (
-    <>
-      {/* <p>peoducts id is : {product_slug}</p> */}
-
-      <Details product={exampleProduct} />
-    </>
+    <main>
+      <Details product={product} />
+    </main>
   );
 }

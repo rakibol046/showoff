@@ -8,7 +8,7 @@ import { fetchProducts } from "@/api/product.api";
 export default async function Home() {
   const sliders = await fetchSlider();
   // console.log("Slider : ", sliders);
-  const products = await fetchProducts();
+  const products = await fetchProducts("limit=8");
   // console.log("Products : ", products);
   return (
     <div>

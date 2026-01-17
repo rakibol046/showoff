@@ -19,6 +19,10 @@ const categorySchema = new Schema(
       type: Boolean,
       default: true,
     },
+    top: {
+      type: Boolean,
+      default: false,
+    },
     note: {
       type: String,
     },
@@ -33,7 +37,7 @@ const categorySchema = new Schema(
       index: true, // Improves query performance
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Pre-save validation to ensure consistency

@@ -10,10 +10,10 @@ export default function Loading() {
           <div className="relative flex items-center justify-center">
             {/* Outer pulse ring */}
             <div className="absolute h-24 w-24 animate-ping rounded-full bg-primary/20" />
-            
+
             {/* Middle rotating ring */}
             <div className="absolute h-20 w-20 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
-            
+
             {/* Inner icon container */}
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-xl">
               <Shirt className="h-7 w-7 animate-pulse" />
@@ -24,15 +24,25 @@ export default function Loading() {
           <div className="flex items-center gap-1 text-muted-foreground">
             <span className="text-lg font-medium">Loading latest styles </span>
             <span className="flex gap-1">
-              <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
-              <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
-              <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+              <span
+                className="animate-bounce"
+                style={{ animationDelay: "0ms" }}
+              >
+                .
+              </span>
+              <span
+                className="animate-bounce"
+                style={{ animationDelay: "150ms" }}
+              >
+                .
+              </span>
+              <span
+                className="animate-bounce"
+                style={{ animationDelay: "300ms" }}
+              >
+                .
+              </span>
             </span>
-          </div>
-
-          {/* Progress bar */}
-          <div className="w-48 h-1 bg-muted rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-primary/50 via-primary to-primary/50 animate-shimmer bg-[length:200%_100%]" />
           </div>
         </div>
       </div>

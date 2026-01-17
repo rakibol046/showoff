@@ -8,7 +8,6 @@ import "swiper/css";
 import "swiper/css/pagination";
 import Link from "next/link";
 
-
 export default function NewArrival({ products }) {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
@@ -58,7 +57,7 @@ export default function NewArrival({ products }) {
           {products.map((product, index) => (
             <SwiperSlide key={index}>
               <div className="group relative w-full aspect-[3/4] rounded overflow-hidden shadow-md">
-                <Link href={`/products/${product.slug}`}>
+                <Link href={`/product/${product.slug}`}>
                   <Image
                     src={
                       product.thumbnail

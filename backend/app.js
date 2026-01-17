@@ -3,8 +3,8 @@ const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const adminRoute = require("./modules/admin/api");
-const clientRoute = require("./modules/client/api");
+const adminRoute = require("./services/admin-api/api");
+const clientRoute = require("./services/public-api/api");
 const Product = require("./models/product.model");
 const Admin = require("./models/admin.model");
 const { defaultProducts, defaultSlider } = require("./demo_data");
@@ -24,7 +24,7 @@ app.use("/uploads", express.static("uploads"));
         console.log("✅ MongoDB connected successfully");
         const hashedPassword = await bcrypt.hash(
           process.env.ADMIN_PASSWORD,
-          10
+          10,
         );
         const adminData = {
           email: process.env.ADMIN_EMAIL,
@@ -52,7 +52,7 @@ app.use("/uploads", express.static("uploads"));
         console.error("❌ MongoDB connection error:", error);
       });
 
-    app.use("/admin_api", adminRoute);
+    app.use("/admin-api", adminRoute);
     app.use("/api", clientRoute);
 
     app.listen(process.env.PORT, () => {
