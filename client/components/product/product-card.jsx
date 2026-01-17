@@ -1,6 +1,8 @@
+import Link from "next/link";
 import React from "react";
 
-const ProductCard = ({ image, name, price }) => {
+const ProductCard = ({ product }) => {
+  console.log(product.thumbnail);
   return (
     <div className="relative group overflow-hidden transition-all duration-300">
       {/* Image Wrapper with Aspect Ratio */}
@@ -24,11 +26,17 @@ const ProductCard = ({ image, name, price }) => {
         </button>
 
         {/* Product Image */}
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+        <Link href={`/product/${product.slug}`}>
+          <img
+            src={
+              product.thumbnail
+                ? `${process.env.NEXT_PUBLIC_API_IMAGE_URL}${product.thumbnail}`
+                : "/images/default-product.webp"
+            }
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        </Link>
 
         {/* Quick View Overlay - hidden on mobile */}
         <div className="absolute bottom-0 w-full bg-black/60 text-white text-center py-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:block">
@@ -38,8 +46,8 @@ const ProductCard = ({ image, name, price }) => {
 
       {/* Product Info */}
       <div className="p-3">
-        <h3 className="font-semibold text-center text-sm">{name}</h3>
-        <p className="text-center text-sm">Tk {price}</p>
+        <h3 className="font-semibold text-center text-sm">{product.name}</h3>
+        <p className="text-center text-sm">Tk {product.sell_price}</p>
       </div>
     </div>
   );

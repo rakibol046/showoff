@@ -51,7 +51,7 @@ const productSchema = new Schema(
     category_id: [{ type: Schema.Types.ObjectId, ref: "Category" }],
     description: { type: String, default: null },
     super_offer: { type: Boolean, default: false },
-    slug: { type: String, default: "" },
+    slug: { type: String, unique: true, required: true },
 
     // Variants
     variants: [variantSchema],

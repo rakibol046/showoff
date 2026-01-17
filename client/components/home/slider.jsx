@@ -8,7 +8,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
-import { getSlider } from "@/features/api/sliderApi";
+import { fetchSlider } from "@/api/slider.api";
 
 export default function VerticalSlider({ sliders }) {
   return (
@@ -32,14 +32,14 @@ export default function VerticalSlider({ sliders }) {
           <Link href={slide.link}>
             <div className="relative h-[220px] md:h-[350px] lg:h-screen w-full  flex items-center justify-center">
               <Image
-                src={`${
-                  slide.image ? slide.image : "/images/default-slide.png"
-                }`}
-                // src={"/images/slider.webp"}
-                alt="slider img"
+                src={
+                  slide.image
+                    ? `${process.env.NEXT_PUBLIC_API_IMAGE_URL}${slide.image}`
+                    : "/images/default-slide.png"
+                }
+                alt={slide.name}
                 fill
                 className="object-cover z-0"
-                priority
               />
             </div>
           </Link>

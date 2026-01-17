@@ -7,7 +7,8 @@ const categorySchema = new Schema(
     type: {
       type: Number,
       required: true,
-      enum: [1, 2], // 1: Parent, 2: Child
+      enum: [1, 2, 3], // 1: Parent, 2: Child, 3: Sub-Child
+      default: 1,
     },
     name: {
       type: String,

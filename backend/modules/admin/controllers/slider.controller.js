@@ -8,7 +8,7 @@ exports.getSliders = async (req, res) => {
     // .populate("category_id product_size.size product_color");
     res.status(200).json(Sliders);
   } catch (error) {
-    res.status(500).json({ message: "❌ Failed to fetch products", error });
+    res.status(500).json({ message: "❌ Failed to fetch Sliders", error });
   }
 };
 

@@ -8,18 +8,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 import Link from "next/link";
 
-const images = [
-  { src: "/images/img1.webp", name: "Red Kurta", price: "$25" },
-  { src: "/images/img2.webp", name: "Blue Kurta", price: "$30" },
-  { src: "/images/img3.webp", name: "Green Kurta", price: "$28" },
-  { src: "/images/img4.webp", name: "Yellow Kurta", price: "$26" },
-  { src: "/images/img5.webp", name: "White Kurta", price: "$29" },
-  { src: "/images/img2.webp", name: "Blue Kurta", price: "$30" },
-  { src: "/images/img3.webp", name: "Green Kurta", price: "$28" },
-  { src: "/images/img4.webp", name: "Yellow Kurta", price: "$26" },
-];
 
-export default function NewArrival() {
+export default function NewArrival({ products }) {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 
@@ -65,13 +55,17 @@ export default function NewArrival() {
             1280: { slidesPerView: 4 },
           }}
         >
-          {images.map((item, index) => (
+          {products.map((product, index) => (
             <SwiperSlide key={index}>
               <div className="group relative w-full aspect-[3/4] rounded overflow-hidden shadow-md">
-                <Link href={`/products`}>
+                <Link href={`/products/${product.slug}`}>
                   <Image
-                    src={item.src}
-                    alt={`Slide ${index + 1}`}
+                    src={
+                      product.thumbnail
+                        ? `${process.env.NEXT_PUBLIC_API_IMAGE_URL}${product.thumbnail}`
+                        : "/images/default-product.webp"
+                    }
+                    alt={product.name}
                     fill
                     className="object-cover"
                   />
@@ -86,8 +80,8 @@ export default function NewArrival() {
                     group-hover:translate-y-0 group-hover:opacity-100
                   "
                 >
-                  <p className=" font-medium">{item.name}</p>
-                  <p className="text-sm">{item.price}</p>
+                  <p className=" font-medium">{product.name}</p>
+                  <p className="text-sm">{product.sell_price}</p>
                 </div>
               </div>
             </SwiperSlide>
