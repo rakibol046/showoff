@@ -60,8 +60,8 @@ export default function NewArrival({ products }) {
                 <Link href={`/product/${product.slug}`}>
                   <Image
                     src={
-                      product.thumbnail
-                        ? `${process.env.NEXT_PUBLIC_API_IMAGE_URL}${product.thumbnail}`
+                      product.images && product.images.length > 0
+                        ? `${process.env.NEXT_PUBLIC_API_IMAGE_URL}${product.images[0]}`
                         : "/images/default-product.webp"
                     }
                     alt={product.name}
@@ -80,7 +80,9 @@ export default function NewArrival({ products }) {
                   "
                 >
                   <p className=" font-medium">{product.name}</p>
-                  <p className="text-sm">{product.sell_price}</p>
+                  <p className="text-sm">
+                    {process.env.NEXT_PUBLIC_CURRENCY} {product.sell_price}
+                  </p>
                 </div>
               </div>
             </SwiperSlide>

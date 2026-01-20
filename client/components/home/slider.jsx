@@ -39,6 +39,7 @@ export default function VerticalSlider({ sliders }) {
                 }
                 alt={slide.name}
                 fill
+                priority
                 className="object-cover z-0"
               />
             </div>

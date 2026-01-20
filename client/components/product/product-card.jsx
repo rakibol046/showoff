@@ -1,8 +1,8 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const ProductCard = ({ product }) => {
-  console.log(product.thumbnail);
   return (
     <div className="relative group overflow-hidden transition-all duration-300">
       {/* Image Wrapper with Aspect Ratio */}
@@ -27,13 +27,14 @@ const ProductCard = ({ product }) => {
 
         {/* Product Image */}
         <Link href={`/product/${product.slug}`}>
-          <img
+          <Image
             src={
-              product.thumbnail
-                ? `${process.env.NEXT_PUBLIC_API_IMAGE_URL}${product.thumbnail}`
+              product.images && product.images.length > 0
+                ? `${process.env.NEXT_PUBLIC_API_IMAGE_URL}${product.images[0]}`
                 : "/images/default-product.webp"
             }
             alt={product.name}
+            fill
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </Link>
@@ -47,7 +48,9 @@ const ProductCard = ({ product }) => {
       {/* Product Info */}
       <div className="p-3">
         <h3 className="font-semibold text-center text-sm">{product.name}</h3>
-        <p className="text-center text-sm">Tk {product.sell_price}</p>
+        <p className="text-center text-sm">
+          {process.env.NEXT_PUBLIC_CURRENCY} {product.sell_price}
+        </p>
       </div>
     </div>
   );

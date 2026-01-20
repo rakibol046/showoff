@@ -22,7 +22,10 @@ export default function GlobalError({ error, reset }) {
             {/* Animated background blur effect */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
               <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-destructive/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+              <div
+                className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-destructive/10 rounded-full blur-3xl animate-pulse"
+                style={{ animationDelay: "2s" }}
+              />
             </div>
 
             {/* Main error card */}
@@ -55,10 +58,12 @@ export default function GlobalError({ error, reset }) {
                   Oops! Something went wrong
                 </h1>
                 <p className="text-lg text-muted-foreground mb-2">
-                  We encountered an unexpected error while processing your request.
+                  We encountered an unexpected error while processing your
+                  request.
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Don't worry, our team has been notified and we're working on it.
+                  Do not worry, our team has been notified and we are working on
+                  it.
                 </p>
               </div>
 
@@ -117,8 +122,6 @@ export default function GlobalError({ error, reset }) {
                 </p>
               </div>
             </div>
-
-          
           </div>
         </div>
       </body>

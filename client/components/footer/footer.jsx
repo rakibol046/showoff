@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import {
   Facebook,
   Instagram,
@@ -18,7 +19,7 @@ import logo from "@/public/images/logo.svg";
 import logoDark from "@/public/images/logo-dark.svg";
 function Footer() {
   return (
-    <div className="px-4 md:px-8 lg:px-12  bg-white dark:bg-black mt-2">
+    <div className="px-4 md:px-8 lg:px-12  bg-white dark:bg-black">
       <div className="h-56 flex justify-center items-center">
         <Image
           src={logo}
@@ -93,24 +94,24 @@ function Footer() {
 
       <div className="grid grid-cols-1 lg:flex text-center justify-between items-center h-24">
         <div className="flex gap-3 justify-center items-center">
-          <a href="#">
+          <Link href="/">
             <Facebook />
-          </a>
-          <a href="#">
+          </Link>
+          <Link href="/">
             <Instagram />
-          </a>
-          <a href="#">
+          </Link>
+          <Link href="/">
             <Twitter />
-          </a>
-          <a href="#">
+          </Link>
+          <Link href="/">
             <Youtube />
-          </a>
-          <a href="#">
+          </Link>
+          <Link href="/">
             <Hash />
-          </a>
-          <a href="#">
+          </Link>
+          <Link href="/">
             <Linkedin />
-          </a>
+          </Link>
         </div>
 
         <p className="montserrat">© 2025 ShowOff. Designed By MR ERROR</p>

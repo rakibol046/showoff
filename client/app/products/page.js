@@ -1,14 +1,17 @@
 import Image from "next/image";
-import {fetchProducts} from "@/api/product.api";
+import { fetchProducts } from "@/api/product.api";
 import ProductCard from "@/components/product/product-card";
 import ProductsFilter from "@/components/product/products-filter";
+
 export const metadata = {
   title: "Products | ShowOff",
   description: "A e-commerce platform",
 };
 
-export default async function Products() {
-  const products = await fetchProducts();
+export default async function Products({ searchParams }) {
+  const params = await searchParams;
+  console.log("Filters:", params);
+  const products = await fetchProducts(params);
 
   return (
     <div className="flex mt-2">

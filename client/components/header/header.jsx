@@ -10,7 +10,7 @@ import Cart from "./cart";
 import { Search, UserRound } from "lucide-react";
 import HeaderTop from "./header-top";
 import Wishlist from "./wishlist";
-import { Menu } from "./navigation-menu";
+import Menu from "./navigation-menu";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
