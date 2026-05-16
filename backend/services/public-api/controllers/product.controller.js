@@ -11,43 +11,17 @@ exports.getProducts = async (req, res) => {
       childcat,
       color,
       size,
-      limit = 10,
-      page = 1,
+      limit,
       price,
-      sort = "-createdAt",
       super_offer,
-      status,
       min_price,
       max_price,
     } = req.query;
-
-    const parsedLimit = parseInt(limit);
-    const parsedPage = parseInt(page);
-
-    if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 100) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid limit parameter. Must be between 1 and 100.",
-      });
-    }
-
-    if (isNaN(parsedPage) || parsedPage < 1) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid page parameter. Must be a positive number.",
-      });
-    }
 
     const filter = {};
 
     if (name) {
       filter.name = { $regex: name, $options: "i" };
-    }
-
-    if (status !== undefined) {
-      filter.status = status === "true";
-    } else {
-      filter.status = true;
     }
 
     if (super_offer !== undefined) {
@@ -72,9 +46,10 @@ exports.getProducts = async (req, res) => {
       });
 
       if (!parentCategory) {
-        return res.status(404).json({
-          success: false,
-          error: `Parent category '${parentcat}' not found`,
+        return res.status(200).json({
+          success: true,
+          data: [],
+          message: `Parent category '${parentcat}' not found`,
         });
       }
 
@@ -109,9 +84,10 @@ exports.getProducts = async (req, res) => {
       });
 
       if (!childCategory) {
-        return res.status(404).json({
-          success: false,
-          error: `Child category '${childcat}' not found`,
+        return res.status(200).json({
+          success: true,
+          data: [],
+          message: `Child category '${childcat}' not found`,
         });
       }
 
@@ -141,9 +117,10 @@ exports.getProducts = async (req, res) => {
       });
 
       if (colorDocs.length === 0) {
-        return res.status(404).json({
-          success: false,
-          error: `Color(s) '${color}' not found`,
+        return res.status(200).json({
+          success: true,
+          data: [],
+          message: `Color(s) '${color}' not found`,
         });
       }
 
@@ -159,9 +136,10 @@ exports.getProducts = async (req, res) => {
       });
 
       if (sizeDocs.length === 0) {
-        return res.status(404).json({
+        return res.status(200).json({
           success: false,
-          error: `Size(s) '${size}' not found`,
+          data: [],
+          message: `Size(s) '${size}' not found`,
         });
       }
 
@@ -169,58 +147,95 @@ exports.getProducts = async (req, res) => {
       filter.size_id = { $in: sizeIds };
     }
 
-    const sortOptions = {};
-    const sortFields = sort.split(",");
+    const parsedLimit = parseInt(limit) || 200;
 
-    sortFields.forEach((field) => {
-      if (field.startsWith("-")) {
-        sortOptions[field.substring(1)] = -1;
-      } else {
-        sortOptions[field] = 1;
-      }
-    });
+    // const [products, totalCount] = await Promise.all([
+    //   Product.find(filter)
+    //     .populate({
+    //       path: "category_id",
+    //       select: "name type parent_id logo_url",
+    //       match: { status: true },
+    //     })
+    //     .populate({
+    //       path: "size_id",
+    //       select: "name label measurements",
+    //       match: { status: true },
+    //     })
+    //     .populate({
+    //       path: "color_id",
+    //       select: "name value hex",
+    //       // match: { status: true },
+    //     })
+    //     .sort({ createdAt: -1 })
+    //     .limit(parsedLimit)
+    //     .lean(),
+    //   Product.countDocuments(filter),
+    // ]);
+    const products = await Product.aggregate([
+      { $match: filter },
 
-    const skip = (parsedPage - 1) * parsedLimit;
+      // CATEGORY (single)
+      // {
+      //   $lookup: {
+      //     from: "categories",
+      //     localField: "category_id",
+      //     foreignField: "_id",
+      //     as: "categories",
+      //     pipeline: [
+      //       { $match: { status: true } },
+      //       { $project: { name: 1, type: 1, parent_id: 1, logo_url: 1 } },
+      //     ],
+      //   },
+      // },
 
-    const [products, totalCount] = await Promise.all([
-      Product.find(filter)
-        .populate({
-          path: "category_id",
-          select: "name type parent_id logo_url",
-          match: { status: true },
-        })
-        .populate({
-          path: "size_id",
-          select: "name label measurements",
-          match: { status: true },
-        })
-        .populate({
-          path: "color_id",
-          select: "name value hex",
-          match: { status: true },
-        })
-        .sort(sortOptions)
-        .skip(skip)
-        .limit(parsedLimit)
-        .lean(),
-      Product.countDocuments(filter),
+      // SIZES (multiple)
+      // {
+      //   $lookup: {
+      //     from: "sizes",
+      //     localField: "size_id",
+      //     foreignField: "_id",
+      //     as: "sizes",
+      //     pipeline: [
+      //       { $match: { status: true } },
+      //       { $project: { name: 1, label: 1, measurements: 1 } },
+      //     ],
+      //   },
+      // },
+
+      // COLORS (multiple)
+      // {
+      //   $lookup: {
+      //     from: "colors",
+      //     localField: "color_id",
+      //     foreignField: "_id",
+      //     as: "colors",
+      //     pipeline: [{ $project: { name: 1, value: 1, hex: 1 } }],
+      //   },
+      // },
+
+      // SORT + PAGINATION
+      { $sort: { createdAt: -1 } },
+      { $limit: parsedLimit },
+
+      // REMOVE RAW IDS
+      {
+        $project: {
+          category_id: 0,
+          size_id: 0,
+          color_id: 0,
+          buy_price: 0,
+          __v: 0,
+          createdAt: 0,
+          updatedAt: 0,
+        },
+      },
     ]);
-
-    const totalPages = Math.ceil(totalCount / parsedLimit);
-    const hasNextPage = parsedPage < totalPages;
-    const hasPrevPage = parsedPage > 1;
+    const totalCount = await Product.countDocuments(filter);
 
     res.status(200).json({
       success: true,
       data: products,
-      pagination: {
-        currentPage: parsedPage,
-        totalPages,
-        totalProducts: totalCount,
-        limit: parsedLimit,
-        hasNextPage,
-        hasPrevPage,
-      },
+      totalProducts: totalCount,
       filters: {
         name,
         parentcat,
@@ -231,7 +246,6 @@ exports.getProducts = async (req, res) => {
         min_price,
         max_price,
         super_offer,
-        status,
       },
     });
   } catch (error) {

@@ -10,7 +10,7 @@ import CategorySection from "@/components/home/home-category";
 export default async function Home() {
   const sliders = await fetchSlider();
   // console.log("Slider : ", sliders);
-  const products = await fetchProducts("limit=8");
+  const { data: products } = await fetchProducts();
   // console.log("Products : ", products);
   const parentCategories = await fetchParentCategories();
   // console.log("Categories : ", parentCategories);

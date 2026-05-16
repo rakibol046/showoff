@@ -24,7 +24,7 @@ export default function AddCategoryForm() {
 
   // Fetch main categories for child selection
   useEffect(() => {
-    fetch("http://localhost:8080/admin_api/category/parent/all")
+    fetch("http://localhost:8080/admin-api/category/parent")
       .then((res) => res.json())
       .then((data) => setMainCategories(data))
       .catch((err) => console.error(err));
@@ -59,7 +59,7 @@ export default function AddCategoryForm() {
 
     console.log("Payload to backend:", payload);
 
-    const res = await fetch("http://localhost:8080/admin_api/category/add", {
+    const res = await fetch("http://localhost:8080/admin-api/category/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

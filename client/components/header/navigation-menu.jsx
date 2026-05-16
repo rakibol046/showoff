@@ -22,7 +22,7 @@ export default function Menu() {
       setCategories(data);
     };
     getCategories();
-  }, [categories]);
+  }, []);
 
   if (!categories || categories.length === 0) {
     return (

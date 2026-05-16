@@ -11,7 +11,7 @@ export const metadata = {
 export default async function Products({ searchParams }) {
   const params = await searchParams;
   console.log("Filters:", params);
-  const products = await fetchProducts(params);
+  const { data: products } = await fetchProducts(params);
 
   return (
     <div className="flex mt-2">

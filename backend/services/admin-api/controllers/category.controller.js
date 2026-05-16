@@ -32,6 +32,16 @@ exports.getParentCategories = async (req, res) => {
   }
 };
 
+exports.getTopCategories = async (req, res) => {
+  try {
+    const categories = await Category.find({ top: true });
+
+    res.status(200).json(categories);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -62,7 +72,7 @@ exports.updateCategory = async (req, res) => {
     const category = await Category.findByIdAndUpdate(
       id,
       { name, status, logo_url },
-      { new: true }
+      { new: true },
     );
 
     if (!category) {
@@ -115,13 +125,11 @@ exports.createCategory = async (req, res) => {
     });
 
     await category.save();
-    res
-      .status(201)
-      .json({
-        status: true,
-        message: "Category created successfully",
-        category,
-      });
+    res.status(201).json({
+      status: true,
+      message: "Category created successfully",
+      category,
+    });
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
   }
