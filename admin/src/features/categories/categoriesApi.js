@@ -3,10 +3,10 @@ import { apiSlice } from "../api/apiSlice";
 export const categoriesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCategories: builder.query({
-      query: () => "/category/all",
+      query: () => "/category",
     }),
     getParentCategories: builder.query({
-      query: () => "/category/parent/all",
+      query: () => "/category/parent",
     }),
     addCategory: builder.mutation({
       query: (data) => ({

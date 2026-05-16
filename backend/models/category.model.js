@@ -7,7 +7,8 @@ const categorySchema = new Schema(
     type: {
       type: Number,
       required: true,
-      enum: [1, 2], // 1: Parent, 2: Child
+      enum: [1, 2, 3], // 1: Parent, 2: Child, 3: Sub-Child
+      default: 1,
     },
     name: {
       type: String,
@@ -17,6 +18,10 @@ const categorySchema = new Schema(
     status: {
       type: Boolean,
       default: true,
+    },
+    top: {
+      type: Boolean,
+      default: false,
     },
     note: {
       type: String,
@@ -32,7 +37,7 @@ const categorySchema = new Schema(
       index: true, // Improves query performance
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Pre-save validation to ensure consistency

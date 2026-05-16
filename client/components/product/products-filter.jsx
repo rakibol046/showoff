@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
+import Link from "next/link";
 
 const categories = [
   {
@@ -46,7 +47,9 @@ const ProductsFilter = () => {
     <div className="w-full max-w-xs h-[calc(100vh-100px)] sticky left-0 top-[93px] overflow-auto space-y-6 bg-white dark:bg-black shadow-md hidden lg:block ">
       <div className="mb-0 bg-[#DFF2EF] dark:bg-[#202020] p-5 flex justify-between items-center">
         <h2 className="text-2xl font-bold  font-asul">Filter</h2>
-        <p className="text-sm hover:cursor-pointer">Clear Filter</p>
+        <Link href="/products" className="text-sm hover:cursor-pointer">
+          Clear Filter
+        </Link>
       </div>
 
       <div>
