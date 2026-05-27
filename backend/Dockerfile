@@ -1,8 +1,8 @@
-FROM node
+FROM node:20-alpine
 
 WORKDIR /app
 
-RUN npm install -g nodemon
+# RUN npm install -g nodemon
 
 COPY package.json .
 
@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["npm", "start"]
+CMD ["node", "app.js"]
