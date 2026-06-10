@@ -23,6 +23,7 @@ exports.getCategories = async (req, res) => {
   }
 };
 exports.getParentCategories = async (req, res) => {
+
   try {
     const categories = await Category.find({ type: 1 });
 

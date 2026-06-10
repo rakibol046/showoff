@@ -1,15 +1,16 @@
 import { Routes, Route, Navigate } from "react-router";
-import React from "react";
 import MainLayout from "./layout/MainLayout.jsx";
 import Home from "./pages/home/Home.jsx";
 import Products from "./pages/product/Products.jsx";
 import Login from "./pages/auth/Login.jsx";
 import Category from "./pages/category/Category.jsx";
+import Size from "./pages/size/Size.jsx";
 import CreateCategory from "./pages/category/CreateCategory.jsx";
 import useAuthCheck from "./hooks/useAuthCheck.js";
 import useAuth from "./hooks/useAuth.js";
 import HeroSlider from "./pages/hero-slider/HeroSlider.jsx";
 import CreateProduct from "./pages/product/CreateProduct.jsx";
+import ColorManagement from "./pages/color/Color.jsx";
 
 export default function App() {
   const authChecked = useAuthCheck();
@@ -43,6 +44,12 @@ export default function App() {
           {/* Slider Routes */}
           <Route path="sliders" element={<HeroSlider />} />
           <Route path="slider/add" element={<CreateCategory />} />
+
+          {/* Size Routes */}
+          <Route path="size" element={<Size />} />
+
+          {/* Size Routes */}
+          <Route path="colors" element={<ColorManagement />} />
         </Route>
       )}
 

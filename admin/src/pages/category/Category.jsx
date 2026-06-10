@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import CreateBtn from "../../components/common/CreateBTN";
-import ShowTitle from "../../components/common/ShowTitle";
 import { useGetCategoriesQuery } from "../../features/categories/categoriesApi";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
