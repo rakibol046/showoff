@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      # Backend checks
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: ./backend
+
+      - name: Install client dependencies
+        run: npm ci
+        working-directory: ./client
+
+      - name: Lint client
+        run: npm run lint
+        working-directory: ./client
+
+      - name: Build client
+        run: npm run build
+        working-directory: ./client
+
+      - name: Install admin dependencies
+        run: npm ci
+        working-directory: ./admin
+
+      - name: Lint admin
+        run: npm run lint
+        working-directory: ./admin
+
+      - name: Build admin
+        run: npm run build
+        working-directory: ./admin

@@ -85,7 +85,7 @@ const Products = () => {
   }, [products, search, filterStock, sortField, sortOrder]);
 
   const totalPages = Math.ceil(filteredProducts.length / perPage);
-  const paginatedProducts = filteredProducts.slice(
+  const paginatedProducts = filteredProducts?.slice(
     (currentPage - 1) * perPage,
     currentPage * perPage
   );
