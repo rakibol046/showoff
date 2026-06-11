@@ -2,7 +2,7 @@ name: Docker Build
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, dev]
     paths:
       - "backend/**"
       - "client/**"
@@ -10,7 +10,7 @@ on:
       - "docker-compose.yaml"
       - ".github/workflows/docker-build.yaml"
   pull_request:
-    branches: [main, develop]
+    branches: [main, dev]
     paths:
       - "backend/**"
       - "client/**"
