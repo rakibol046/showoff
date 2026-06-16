@@ -1,622 +1,233 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import {
+  useGetColorsQuery, useCreateColorMutation, useUpdateColorMutation,
+  useToggleColorStatusMutation, useDeleteColorMutation, useBulkDeleteColorsMutation,
+} from "@/features/colors/colorsApi";
+import PageHeader from "@/components/common/PageHeader";
+import TableSkeleton from "@/components/common/TableSkeleton";
+import ConfirmDialog from "@/components/common/ConfirmDialog";
+import StatusBadge from "@/components/common/StatusBadge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Pencil, Trash2 } from "lucide-react";
 
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-const API_BASE = "http://localhost:8080/admin-api/colors";
+const HEX_REGEX = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
-const apiFetch = async (url, options = {}) => {
-  const res = await fetch(url, {
-    headers: { "Content-Type": "application/json" },
-    ...options,
+function ColorFormDialog({ open, onOpenChange, editData }) {
+  const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
+    defaultValues: editData || { name: "", value: "", hex: "#6366f1", status: true },
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Request failed");
-  return data;
-};
+  const [createColor, { isLoading: creating }] = useCreateColorMutation();
+  const [updateColor, { isLoading: updating }] = useUpdateColorMutation();
+  const isLoading = creating || updating;
 
-const isValidHex = (hex) => /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex);
+  const hex = watch("hex");
 
-const emptyForm = { name: "", value: "", hex: "#000000", status: true };
-
-// ─── TOAST ────────────────────────────────────────────────────────────────────
-function Toast({ toasts, remove }) {
-  return (
-    <div style={{
-      position: "fixed", top: 20, right: 20, zIndex: 9999,
-      display: "flex", flexDirection: "column", gap: 8,
-    }}>
-      {toasts.map(t => (
-        <div key={t.id} onClick={() => remove(t.id)} style={{
-          background: t.type === "error" ? "#ef4444" : t.type === "warn" ? "#f59e0b" : "#10b981",
-          color: "#fff", padding: "10px 16px", borderRadius: 8,
-          fontSize: 13, fontWeight: 500, cursor: "pointer",
-          boxShadow: "0 4px 12px rgba(0,0,0,.15)",
-          animation: "slideIn .2s ease", maxWidth: 320,
-        }}>
-          {t.msg}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function useToast() {
-  const [toasts, setToasts] = useState([]);
-  const push = useCallback((msg, type = "success") => {
-    const id = Date.now();
-    setToasts(p => [...p, { id, msg, type }]);
-    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 3500);
-  }, []);
-  const remove = useCallback(id => setToasts(p => p.filter(t => t.id !== id)), []);
-  return { toasts, push, remove };
-}
-
-// ─── CONFIRM DIALOG ───────────────────────────────────────────────────────────
-function ConfirmDialog({ message, onConfirm, onCancel }) {
-  return (
-    <div style={{
-      position: "fixed", inset: 0, background: "rgba(0,0,0,.45)",
-      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000,
-    }}>
-      <div style={{
-        background: "#fff", borderRadius: 12, padding: "28px 32px",
-        maxWidth: 380, width: "90%", boxShadow: "0 20px 60px rgba(0,0,0,.2)",
-      }}>
-        <p style={{ margin: "0 0 20px", fontSize: 15, color: "#374151", lineHeight: 1.5 }}>{message}</p>
-        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button onClick={onCancel} style={btnStyle("ghost")}>Cancel</button>
-          <button onClick={onConfirm} style={btnStyle("danger")}>Delete</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── COLOR PICKER INPUT ───────────────────────────────────────────────────────
-function ColorPickerField({ value, onChange }) {
-  const [inputVal, setInputVal] = useState(value);
-
-  useEffect(() => { setInputVal(value); }, [value]);
-
-  const handleTextChange = (v) => {
-    setInputVal(v);
-    if (isValidHex(v)) onChange(v);
+  const onSubmit = async (data) => {
+    const result = editData
+      ? await updateColor({ id: editData._id, ...data })
+      : await createColor(data);
+    if (!result.error) { onOpenChange(false); reset(); }
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <div style={{ position: "relative", flexShrink: 0 }}>
-        <input
-          type="color"
-          value={isValidHex(value) ? value : "#000000"}
-          onChange={e => { onChange(e.target.value); setInputVal(e.target.value); }}
-          style={{
-            width: 44, height: 44, padding: 2, border: "1.5px solid #e5e7eb",
-            borderRadius: 8, cursor: "pointer", background: "none",
-          }}
-        />
-      </div>
-      <input
-        type="text"
-        value={inputVal}
-        onChange={e => handleTextChange(e.target.value)}
-        placeholder="#000000"
-        maxLength={7}
-        style={{
-          ...inputStyle, flex: 1,
-          borderColor: isValidHex(inputVal) ? "#e5e7eb" : "#ef4444",
-        }}
-      />
-      <div style={{
-        width: 36, height: 36, borderRadius: 8, flexShrink: 0,
-        background: isValidHex(value) ? value : "#e5e7eb",
-        border: "1.5px solid #e5e7eb",
-      }} />
-    </div>
-  );
-}
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) reset(); }}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>{editData ? "Edit Color" : "Add Color"}</DialogTitle>
+        </DialogHeader>
 
-// ─── DRAWER FORM ──────────────────────────────────────────────────────────────
-function ColorDrawer({ mode, initial, onSave, onClose, saving }) {
-  const [form, setForm] = useState(emptyForm);
-  const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    if (initial) {
-      setForm({
-        name: initial.name || "",
-        value: initial.value || "",
-        hex: initial.hex || "#000000",
-        status: initial.status ?? true,
-      });
-    } else {
-      setForm(emptyForm);
-    }
-    setErrors({});
-  }, [initial]);
-
-  const set = (k, v) => {
-    setForm(p => ({ ...p, [k]: v }));
-    if (errors[k]) setErrors(p => ({ ...p, [k]: null }));
-  };
-
-  const validate = () => {
-    const e = {};
-    if (!form.name.trim()) e.name = "Name is required";
-    if (!form.hex.trim()) e.hex = "Hex code is required";
-    else if (!isValidHex(form.hex)) e.hex = "Invalid hex (e.g. #FF0000)";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
-  const handleSubmit = () => {
-    if (!validate()) return;
-    onSave({
-      name: form.name.trim(),
-      value: form.value.trim(),
-      hex: form.hex,
-      status: form.status,
-    });
-  };
-
-  return (
-    <div style={{
-      position: "fixed", inset: 0, background: "rgba(0,0,0,.4)",
-      display: "flex", justifyContent: "flex-end", zIndex: 500,
-    }} onClick={onClose}>
-      <div style={{
-        background: "#fff", width: "min(440px, 100vw)", height: "100%",
-        overflowY: "auto", padding: "28px 28px 40px",
-        boxShadow: "-8px 0 40px rgba(0,0,0,.12)",
-        animation: "drawerIn .22s ease",
-      }} onClick={e => e.stopPropagation()}>
-
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#111827" }}>
-            {mode === "edit" ? "Edit Color" : "Add New Color"}
-          </h2>
-          <button onClick={onClose} style={{
-            border: "none", background: "none", cursor: "pointer",
-            fontSize: 22, color: "#9ca3af", lineHeight: 1,
-          }}>×</button>
-        </div>
-
-        {/* Color preview banner */}
-        <div style={{
-          height: 80, borderRadius: 10, marginBottom: 24,
-          background: isValidHex(form.hex) ? form.hex : "#e5e7eb",
-          border: "1.5px solid #e5e7eb",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          transition: "background .2s",
-        }}>
-          <span style={{
-            fontSize: 13, fontWeight: 600, padding: "4px 12px",
-            borderRadius: 20, background: "rgba(255,255,255,.7)",
-            color: "#374151", backdropFilter: "blur(4px)",
-          }}>
-            {form.name || "Color preview"}
+        {/* Preview */}
+        <div
+          className="h-16 rounded-lg border flex items-center justify-center"
+          style={{ backgroundColor: HEX_REGEX.test(hex) ? hex : "#e5e7eb" }}
+        >
+          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/70 backdrop-blur-sm">
+            {watch("name") || "Preview"}
           </span>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <Field label="Color Name *" error={errors.name}>
-            <input
-              value={form.name} onChange={e => set("name", e.target.value)}
-              placeholder="e.g. Midnight Blue"
-              style={{ ...inputStyle, borderColor: errors.name ? "#ef4444" : "#e5e7eb" }}
-            />
-          </Field>
-
-          <Field label="Value / Code" error={errors.value}>
-            <input
-              value={form.value} onChange={e => set("value", e.target.value)}
-              placeholder="e.g. midnight-blue (optional)"
-              style={inputStyle}
-            />
-          </Field>
-
-          <Field label="Hex Color *" error={errors.hex}>
-            <ColorPickerField
-              value={form.hex}
-              onChange={v => set("hex", v)}
-            />
-            {errors.hex && (
-              <p style={{ margin: "4px 0 0", fontSize: 12, color: "#ef4444" }}>{errors.hex}</p>
-            )}
-          </Field>
-
-          <Field label="Status">
-            <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-              <div
-                onClick={() => set("status", !form.status)}
-                style={{
-                  width: 44, height: 24, borderRadius: 12,
-                  background: form.status ? "#6366f1" : "#d1d5db",
-                  position: "relative", transition: "background .2s", cursor: "pointer",
-                }}
-              >
-                <span style={{
-                  position: "absolute", top: 3, left: form.status ? 23 : 3,
-                  width: 18, height: 18, borderRadius: "50%", background: "#fff",
-                  transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,.2)",
-                }} />
-              </div>
-              <span style={{ fontSize: 14, color: "#374151" }}>
-                {form.status ? "Active" : "Inactive"}
-              </span>
-            </label>
-          </Field>
-
-          <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
-            <button onClick={onClose} style={{ ...btnStyle("ghost"), flex: 1 }}>Cancel</button>
-            <button
-              onClick={handleSubmit}
-              disabled={saving}
-              style={{ ...btnStyle("primary"), flex: 2, opacity: saving ? .6 : 1 }}
-            >
-              {saving ? "Saving…" : mode === "edit" ? "Save Changes" : "Add Color"}
-            </button>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <Label>Name *</Label>
+            <Input className="mt-1" placeholder="Midnight Blue" {...register("name", { required: "Required" })} />
+            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
           </div>
-        </div>
-      </div>
-    </div>
+
+          <div>
+            <Label>Value / Code</Label>
+            <Input className="mt-1" placeholder="midnight-blue" {...register("value")} />
+          </div>
+
+          <div>
+            <Label>Hex Color *</Label>
+            <div className="flex items-center gap-2 mt-1">
+              <input
+                type="color"
+                value={HEX_REGEX.test(hex) ? hex : "#6366f1"}
+                onChange={(e) => setValue("hex", e.target.value)}
+                className="w-10 h-10 rounded border cursor-pointer p-0.5"
+              />
+              <Input
+                {...register("hex", {
+                  required: "Required",
+                  pattern: { value: HEX_REGEX, message: "Invalid hex (e.g. #FF0000)" },
+                })}
+                placeholder="#000000"
+              />
+              <div className="w-10 h-10 rounded border shrink-0" style={{ backgroundColor: HEX_REGEX.test(hex) ? hex : "#e5e7eb" }} />
+            </div>
+            {errors.hex && <p className="text-xs text-red-500 mt-1">{errors.hex.message}</p>}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Switch checked={!!watch("status")} onCheckedChange={(v) => setValue("status", v)} />
+            <Label>Active</Label>
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <Button type="submit" disabled={isLoading} className="flex-1">
+              {isLoading ? "Saving..." : editData ? "Save Changes" : "Add Color"}
+            </Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-function Field({ label, children, error }) {
-  return (
-    <div>
-      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
-        {label}
-      </label>
-      {children}
-      {error && <p style={{ margin: "4px 0 0", fontSize: 12, color: "#ef4444" }}>{error}</p>}
-    </div>
-  );
-}
-
-// ─── STYLES ───────────────────────────────────────────────────────────────────
-const inputStyle = {
-  width: "100%", padding: "9px 12px", border: "1.5px solid #e5e7eb",
-  borderRadius: 8, fontSize: 14, color: "#111827", outline: "none",
-  boxSizing: "border-box", background: "#fafafa", transition: "border-color .15s",
-};
-
-function btnStyle(variant) {
-  const base = {
-    padding: "9px 18px", borderRadius: 8, border: "none",
-    cursor: "pointer", fontSize: 14, fontWeight: 600, transition: "all .15s",
-  };
-  if (variant === "primary") return { ...base, background: "#6366f1", color: "#fff" };
-  if (variant === "danger")  return { ...base, background: "#ef4444", color: "#fff" };
-  if (variant === "ghost")   return { ...base, background: "#f3f4f6", color: "#374151" };
-  if (variant === "icon")    return { ...base, background: "none", padding: "6px 10px", color: "#6b7280" };
-  return base;
-}
-
-// ─── COLOR SWATCH ─────────────────────────────────────────────────────────────
-function ColorSwatch({ hex, size = 32 }) {
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: 6,
-      background: isValidHex(hex) ? hex : "#e5e7eb",
-      border: "1.5px solid rgba(0,0,0,.08)",
-      flexShrink: 0,
-    }} title={hex} />
-  );
-}
-
-function Badge({ active }) {
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: 5,
-      padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600,
-      background: active ? "#ecfdf5" : "#fef2f2",
-      color: active ? "#059669" : "#dc2626",
-    }}>
-      <span style={{ width: 6, height: 6, borderRadius: "50%", background: "currentColor" }} />
-      {active ? "Active" : "Inactive"}
-    </span>
-  );
-}
-
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function ColorManagement() {
-  const { toasts, push, remove } = useToast();
-  const [colors, setColors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selected, setSelected] = useState(new Set());
-  const [drawer, setDrawer] = useState(null);
-  const [confirm, setConfirm] = useState(null);
-  const [viewMode, setViewMode] = useState("table"); // "table" | "grid"
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
-  const fetchColors = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = statusFilter !== "all" ? `?status=${statusFilter}` : "";
-      const data = await apiFetch(`${API_BASE}${params}`);
-      setColors(data.data);
-    } catch (e) {
-      push(e.message, "error");
-    } finally {
-      setLoading(false);
-    }
-  }, [statusFilter]);
+  const params = {};
+  if (statusFilter !== "all") params.status = statusFilter;
+  const { data: colors = [], isLoading } = useGetColorsQuery(params);
 
-  useEffect(() => { fetchColors(); }, [fetchColors]);
+  const [toggleStatus] = useToggleColorStatusMutation();
+  const [deleteColor, { isLoading: deleting }] = useDeleteColorMutation();
+  const [bulkDelete, { isLoading: bulkDeleting }] = useBulkDeleteColorsMutation();
 
-  const filtered = colors.filter(c =>
+  const filtered = (Array.isArray(colors) ? colors : []).filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
-    (c.value || "").toLowerCase().includes(search.toLowerCase()) ||
     (c.hex || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  const toggleSelect = id => setSelected(p => {
-    const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n;
+  const toggleSelect = (id) => setSelected((prev) => {
+    const n = new Set(prev);
+    n.has(id) ? n.delete(id) : n.add(id);
+    return n;
   });
   const allSelected = filtered.length > 0 && selected.size === filtered.length;
-  const toggleAll = () => setSelected(allSelected ? new Set() : new Set(filtered.map(c => c._id)));
+  const toggleAll = () => setSelected(allSelected ? new Set() : new Set(filtered.map((c) => c._id)));
 
-  const handleSave = async (payload) => {
-    setSaving(true);
-    try {
-      if (drawer.mode === "edit") {
-        await apiFetch(`${API_BASE}/${drawer.data._id}`, { method: "PUT", body: JSON.stringify(payload) });
-        push("Color updated successfully");
-      } else {
-        await apiFetch(API_BASE, { method: "POST", body: JSON.stringify(payload) });
-        push("Color added successfully");
-      }
-      setDrawer(null);
-      fetchColors();
-    } catch (e) {
-      push(e.message, "error");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleToggle = async (color) => {
-    try {
-      await apiFetch(`${API_BASE}/${color._id}/toggle-status`, { method: "PATCH" });
-      push(`Color marked as ${color.status ? "inactive" : "active"}`);
-      fetchColors();
-    } catch (e) { push(e.message, "error"); }
-  };
-
-  const handleDelete = (id) => {
-    setConfirm({
-      msg: "Delete this color? This action cannot be undone.",
-      onConfirm: async () => {
-        setConfirm(null);
-        try {
-          await apiFetch(`${API_BASE}/${id}`, { method: "DELETE" });
-          push("Color deleted");
-          setSelected(p => { const n = new Set(p); n.delete(id); return n; });
-          fetchColors();
-        } catch (e) { push(e.message, "error"); }
-      },
-    });
-  };
-
-  const handleBulkDelete = () => {
-    if (selected.size === 0) return;
-    setConfirm({
-      msg: `Delete ${selected.size} selected color(s)? This cannot be undone.`,
-      onConfirm: async () => {
-        setConfirm(null);
-        try {
-          await apiFetch(API_BASE, { method: "DELETE", body: JSON.stringify({ ids: [...selected] }) });
-          push(`${selected.size} color(s) deleted`);
-          setSelected(new Set());
-          fetchColors();
-        } catch (e) { push(e.message, "error"); }
-      },
-    });
-  };
+  const openAdd = () => { setEditData(null); setDialogOpen(true); };
+  const openEdit = (c) => { setEditData(c); setDialogOpen(true); };
 
   return (
-    <div style={{ fontFamily: "'Inter', system-ui, sans-serif", color: "#111827" }}>
-      <style>{`
-        @keyframes slideIn { from { transform: translateX(20px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
-        @keyframes drawerIn { from { transform: translateX(100%) } to { transform: translateX(0) } }
-        input:focus { border-color: #6366f1 !important; box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
-        button:hover { filter: brightness(.93); }
-        tr:hover td { background: #fafafa !important; }
-      `}</style>
+    <div className="space-y-6">
+      <PageHeader title="Colors" subtitle={`${(Array.isArray(colors) ? colors : []).length} colors total`} actionLabel="Add Color" onAction={openAdd} />
 
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Color Management</h1>
-          <p style={{ margin: "4px 0 0", fontSize: 14, color: "#6b7280" }}>
-            {colors.length} color{colors.length !== 1 ? "s" : ""} total
-          </p>
-        </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          {/* View toggle */}
-          <div style={{ display: "flex", border: "1.5px solid #e5e7eb", borderRadius: 8, overflow: "hidden" }}>
-            {["table", "grid"].map(m => (
-              <button key={m} onClick={() => setViewMode(m)} style={{
-                padding: "7px 14px", border: "none", cursor: "pointer", fontSize: 13,
-                fontWeight: 500, background: viewMode === m ? "#6366f1" : "#fff",
-                color: viewMode === m ? "#fff" : "#6b7280", transition: "all .15s",
-              }}>
-                {m === "table" ? "☰ Table" : "⊞ Grid"}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => setDrawer({ mode: "add", data: null })}
-            style={{ ...btnStyle("primary"), display: "flex", alignItems: "center", gap: 8 }}
-          >
-            <span style={{ fontSize: 18, lineHeight: 1 }}>+</span> Add Color
-          </button>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 18, flexWrap: "wrap", alignItems: "center" }}>
-        <input
-          value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search by name, value or hex…"
-          style={{ ...inputStyle, width: 260 }}
-        />
-        <select
-          value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          style={{ ...inputStyle, width: 140, cursor: "pointer" }}
-        >
-          <option value="all">All statuses</option>
-          <option value="true">Active</option>
-          <option value="false">Inactive</option>
-        </select>
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <Input placeholder="Search colors..." value={search} onChange={(e) => setSearch(e.target.value)} className="sm:max-w-xs" />
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="sm:w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="true">Active</SelectItem>
+            <SelectItem value="false">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
         {selected.size > 0 && (
-          <button onClick={handleBulkDelete} style={btnStyle("danger")}>
+          <Button variant="destructive" size="sm" onClick={() => setBulkDeleteOpen(true)}>
             Delete {selected.size} selected
-          </button>
+          </Button>
         )}
       </div>
 
-      {/* Content */}
-      {loading ? (
-        <div style={{ padding: 48, textAlign: "center", color: "#9ca3af", fontSize: 14 }}>Loading colors…</div>
-      ) : filtered.length === 0 ? (
-        <div style={{
-          background: "#fff", borderRadius: 12, border: "1.5px solid #e5e7eb",
-          padding: 56, textAlign: "center",
-        }}>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>🎨</div>
-          <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>
-            {search ? "No colors match your search." : "No colors yet. Add your first one!"}
-          </p>
-        </div>
-      ) : viewMode === "grid" ? (
-        /* ── Grid View ── */
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14 }}>
-          {filtered.map(color => (
-            <div key={color._id} style={{
-              background: "#fff", borderRadius: 12, border: "1.5px solid #e5e7eb",
-              overflow: "hidden", transition: "box-shadow .15s",
-            }}>
-              {/* Swatch */}
-              <div style={{
-                height: 100, background: isValidHex(color.hex) ? color.hex : "#e5e7eb",
-                position: "relative",
-              }}>
-                <div style={{ position: "absolute", top: 8, right: 8, display: "flex", gap: 6 }}>
-                  <button onClick={() => setDrawer({ mode: "edit", data: color })}
-                    style={{ padding: "4px 8px", background: "rgba(255,255,255,.85)", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>✏️</button>
-                  <button onClick={() => handleDelete(color._id)}
-                    style={{ padding: "4px 8px", background: "rgba(255,255,255,.85)", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>🗑️</button>
-                </div>
-              </div>
-              <div style={{ padding: "12px 14px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                  <span style={{ fontWeight: 700, fontSize: 14 }}>{color.name}</span>
-                  <div onClick={() => handleToggle(color)} style={{ cursor: "pointer" }}>
-                    <Badge active={color.status} />
-                  </div>
-                </div>
-                <p style={{ margin: 0, fontSize: 12, color: "#6b7280", fontFamily: "monospace" }}>{color.hex}</p>
-                {color.value && <p style={{ margin: "2px 0 0", fontSize: 12, color: "#9ca3af" }}>{color.value}</p>}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        /* ── Table View ── */
-        <div style={{ background: "#fff", borderRadius: 12, border: "1.5px solid #e5e7eb", overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ background: "#f9fafb", borderBottom: "1.5px solid #e5e7eb" }}>
-                <Th style={{ width: 44 }}>
-                  <input type="checkbox" checked={allSelected} onChange={toggleAll} style={{ cursor: "pointer" }} />
-                </Th>
-                <Th style={{ width: 56 }}>Color</Th>
-                <Th>Name</Th>
-                <Th>Value</Th>
-                <Th>Hex</Th>
-                <Th>Status</Th>
-                <Th style={{ width: 100 }}>Actions</Th>
+      <div className="border rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[550px]">
+            <thead className="bg-muted border-b">
+              <tr>
+                <th className="px-4 py-3 w-10">
+                  <input type="checkbox" checked={allSelected} onChange={toggleAll} className="cursor-pointer" />
+                </th>
+                {["Swatch", "Name", "Value", "Hex", "Status", "Actions"].map((h) => (
+                  <th key={h} className="px-4 py-3 text-left font-medium text-muted-foreground">{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody>
-              {filtered.map((color, i) => (
-                <tr key={color._id} style={{ borderBottom: i < filtered.length - 1 ? "1px solid #f3f4f6" : "none" }}>
-                  <Td>
-                    <input type="checkbox" checked={selected.has(color._id)} onChange={() => toggleSelect(color._id)} style={{ cursor: "pointer" }} />
-                  </Td>
-                  <Td>
-                    <ColorSwatch hex={color.hex} size={34} />
-                  </Td>
-                  <Td>
-                    <span style={{ fontWeight: 600, fontSize: 14 }}>{color.name}</span>
-                  </Td>
-                  <Td><span style={{ color: "#6b7280", fontSize: 13 }}>{color.value || "—"}</span></Td>
-                  <Td>
-                    <code style={{
-                      fontSize: 12, background: "#f3f4f6", padding: "3px 8px",
-                      borderRadius: 4, color: "#374151",
-                    }}>{color.hex}</code>
-                  </Td>
-                  <Td>
-                    <div style={{ cursor: "pointer" }} onClick={() => handleToggle(color)}>
-                      <Badge active={color.status} />
-                    </div>
-                  </Td>
-                  <Td>
-                    <div style={{ display: "flex", gap: 4 }}>
-                      <button onClick={() => setDrawer({ mode: "edit", data: color })} title="Edit" style={{ ...btnStyle("icon"), fontSize: 16 }}>✏️</button>
-                      <button onClick={() => handleDelete(color._id)} title="Delete" style={{ ...btnStyle("icon"), fontSize: 16 }}>🗑️</button>
-                    </div>
-                  </Td>
-                </tr>
-              ))}
-            </tbody>
+            {isLoading ? (
+              <TableSkeleton rows={8} cols={7} />
+            ) : (
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr><td colSpan={7} className="text-center py-12 text-muted-foreground">No colors found</td></tr>
+                ) : (
+                  filtered.map((color) => (
+                    <tr key={color._id} className="border-b hover:bg-muted/40 transition-colors">
+                      <td className="px-4 py-3">
+                        <input type="checkbox" checked={selected.has(color._id)} onChange={() => toggleSelect(color._id)} className="cursor-pointer" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="w-8 h-8 rounded-lg border shadow-sm" style={{ backgroundColor: color.hex }} title={color.hex} />
+                      </td>
+                      <td className="px-4 py-3 font-medium">{color.name}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{color.value || "—"}</td>
+                      <td className="px-4 py-3">
+                        <code className="text-xs bg-muted px-2 py-0.5 rounded font-mono">{color.hex}</code>
+                      </td>
+                      <td className="px-4 py-3 cursor-pointer" onClick={() => toggleStatus(color._id)}>
+                        <StatusBadge active={color.status} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => openEdit(color)}><Pencil className="w-4 h-4" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(color._id)} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            )}
           </table>
         </div>
-      )}
+      </div>
 
-      {drawer && (
-        <ColorDrawer
-          mode={drawer.mode}
-          initial={drawer.data}
-          onSave={handleSave}
-          onClose={() => setDrawer(null)}
-          saving={saving}
-        />
-      )}
+      <ColorFormDialog open={dialogOpen} onOpenChange={setDialogOpen} editData={editData} key={editData?._id || "new"} />
 
-      {confirm && (
-        <ConfirmDialog
-          message={confirm.msg}
-          onConfirm={confirm.onConfirm}
-          onCancel={() => setConfirm(null)}
-        />
-      )}
-
-      <Toast toasts={toasts} remove={remove} />
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={(v) => !v && setDeleteId(null)}
+        onConfirm={async () => { await deleteColor(deleteId); setDeleteId(null); }}
+        loading={deleting}
+        title="Delete color?"
+      />
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        onOpenChange={setBulkDeleteOpen}
+        onConfirm={async () => { await bulkDelete([...selected]); setSelected(new Set()); setBulkDeleteOpen(false); }}
+        loading={bulkDeleting}
+        title={`Delete ${selected.size} colors?`}
+        description="This will permanently delete all selected colors."
+      />
     </div>
-  );
-}
-
-function Th({ children, style }) {
-  return (
-    <th style={{
-      padding: "12px 16px", textAlign: "left", fontSize: 12,
-      fontWeight: 700, color: "#6b7280", textTransform: "uppercase",
-      letterSpacing: ".05em", ...style,
-    }}>{children}</th>
-  );
-}
-
-function Td({ children }) {
-  return (
-    <td style={{ padding: "13px 16px", fontSize: 14, color: "#374151", verticalAlign: "middle" }}>
-      {children}
-    </td>
   );
 }

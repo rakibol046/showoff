@@ -1,16 +1,21 @@
 import { Routes, Route, Navigate } from "react-router";
 import MainLayout from "./layout/MainLayout.jsx";
-import Home from "./pages/home/Home.jsx";
-import Products from "./pages/product/Products.jsx";
 import Login from "./pages/auth/Login.jsx";
+import Dashboard from "./pages/dashboard/Dashboard.jsx";
+import Products from "./pages/product/Products.jsx";
+import CreateProduct from "./pages/product/CreateProduct.jsx";
+import EditProduct from "./pages/product/EditProduct.jsx";
 import Category from "./pages/category/Category.jsx";
+import ColorManagement from "./pages/color/Color.jsx";
 import Size from "./pages/size/Size.jsx";
-import CreateCategory from "./pages/category/CreateCategory.jsx";
+import HeroSlider from "./pages/hero-slider/HeroSlider.jsx";
+import Orders from "./pages/orders/Orders.jsx";
+import SettingsPage from "./pages/settings/Settings.jsx";
+import CreateOrder from "./pages/orders/CreateOrder.jsx";
+import Customers from "./pages/customers/Customers.jsx";
+import Profile from "./pages/profile/Profile.jsx";
 import useAuthCheck from "./hooks/useAuthCheck.js";
 import useAuth from "./hooks/useAuth.js";
-import HeroSlider from "./pages/hero-slider/HeroSlider.jsx";
-import CreateProduct from "./pages/product/CreateProduct.jsx";
-import ColorManagement from "./pages/color/Color.jsx";
 
 export default function App() {
   const authChecked = useAuthCheck();
@@ -22,38 +27,34 @@ export default function App() {
 
   return (
     <Routes>
-      {/* Public route */}
       <Route
         path="/login"
         element={!isLoggedIn ? <Login /> : <Navigate to="/" replace />}
       />
 
-      {/* Protected routes, wrapped in MainLayout */}
       {isLoggedIn && (
         <Route path="/" element={<MainLayout />}>
-          <Route index element={<Home />} />
+          <Route index element={<Dashboard />} />
 
-          {/* Product Routes */}
           <Route path="products" element={<Products />} />
           <Route path="add-product" element={<CreateProduct />} />
+          <Route path="products/:id/edit" element={<EditProduct />} />
 
-          {/* Categories Routes */}
           <Route path="categories" element={<Category />} />
-          <Route path="add-category" element={<CreateCategory />} />
 
-          {/* Slider Routes */}
           <Route path="sliders" element={<HeroSlider />} />
-          <Route path="slider/add" element={<CreateCategory />} />
 
-          {/* Size Routes */}
-          <Route path="size" element={<Size />} />
-
-          {/* Size Routes */}
+          <Route path="sizes" element={<Size />} />
           <Route path="colors" element={<ColorManagement />} />
+
+          <Route path="orders" element={<Orders />} />
+          <Route path="orders/create" element={<CreateOrder />} />
+          <Route path="customers" element={<Customers />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
       )}
 
-      {/* Fallback route for unauthorized access */}
       {!isLoggedIn && (
         <Route path="*" element={<Navigate to="/login" replace />} />
       )}
