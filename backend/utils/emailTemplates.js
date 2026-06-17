@@ -87,7 +87,7 @@ exports.orderConfirmationEmail = (order, settings) => {
       </tfoot>
     </table>
 
-    ${email ? `<p style="margin:24px 0 0;font-size:14px;color:#6b7280;">Questions? <a href="mailto:${email}" style="color:#2563eb;">${email}</a></p>` : ""}
+    ${email ? `<p style="margin:24px 0 0;font-size:14px;color:#6b7280;">If you have any questions, reply to this email or contact us at? <a href="mailto:${email}" style="color:#2563eb;">${email}</a></p>` : ""}
     <p style="margin:8px 0 0;font-size:14px;color:#6b7280;">Thank you for shopping with <strong>${name}</strong>!</p>
   `;
 

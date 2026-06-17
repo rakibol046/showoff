@@ -1,8 +1,10 @@
 import { Package, ShoppingCart, Users, DollarSign, TrendingUp, AlertCircle } from "lucide-react";
+import { imgUrl, onImgError } from "@/lib/imageUrl";
 import { useGetDashboardStatsQuery } from "@/features/dashboard/dashboardApi";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router";
 import useCurrency from "@/hooks/useCurrency";
+import SalesChart from "./SalesChart";
 
 const ORDER_STATUS_LABELS = {
   pending: "Pending",
@@ -12,13 +14,6 @@ const ORDER_STATUS_LABELS = {
   cancelled: "Cancelled",
 };
 
-const ORDER_STATUS_COLORS = {
-  pending: "bg-yellow-100 text-yellow-800",
-  processing: "bg-blue-100 text-blue-800",
-  shipped: "bg-purple-100 text-purple-800",
-  delivered: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
-};
 
 const ORDER_BADGE_COLORS = [0, 1, 2, 3, 4].map((s) => {
   const map = {
@@ -93,6 +88,8 @@ export default function Dashboard() {
         </div>
       )}
 
+      <SalesChart />
+
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Recent Orders */}
         <div className="bg-card border rounded-xl p-5">
@@ -155,7 +152,7 @@ export default function Dashboard() {
               {stats.lowStockProducts.map((product) => (
                 <div key={product._id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
                   {product.images?.[0] ? (
-                    <img src={`http://localhost:8080${product.images[0]}`} alt={product.name} className="w-10 h-10 rounded object-cover border" />
+                    <img src={imgUrl(product.images[0])} alt={product.name} onError={onImgError} className="w-10 h-10 rounded object-cover border" />
                   ) : (
                     <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
                       <Package className="w-4 h-4 text-muted-foreground" />

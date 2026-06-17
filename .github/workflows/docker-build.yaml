@@ -5,7 +5,7 @@ on:
     branches: [main, dev]
     paths:
       - "backend/**"
-      - "client/**"
+      - "shop/**"
       - "admin/**"
       - "docker-compose.yaml"
       - ".github/workflows/docker-build.yaml"
@@ -13,7 +13,7 @@ on:
     branches: [main, dev]
     paths:
       - "backend/**"
-      - "client/**"
+      - "shop/**"
       - "admin/**"
       - "docker-compose.yaml"
 
@@ -50,7 +50,7 @@ jobs:
           push: false
           tags: showoff-admin:latest
 
-  build-client:
+  build-shop:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,10 +58,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build client Docker image
+      - name: Build shop Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./client
-          file: ./client/Dockerfile
+          context: ./shop
+          file: ./shop/Dockerfile
           push: false
-          tags: showoff-client:latest
+          tags: showoff-shop:latest

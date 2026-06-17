@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { imgUrl, onImgError } from "@/lib/imageUrl";
 import { useForm } from "react-hook-form";
 import { useGetProfileQuery, useUpdateProfileMutation, useChangePasswordMutation } from "@/features/auth/authApi";
 import { Button } from "@/components/ui/button";
@@ -51,7 +52,8 @@ export default function Profile() {
             <div className="flex items-center gap-4 mb-6">
               {avatarPreview || admin?.profile_picture ? (
                 <img
-                  src={avatarPreview || `http://localhost:8080${admin.profile_picture}`}
+                  src={avatarPreview || imgUrl(admin.profile_picture)}
+                  onError={onImgError}
                   alt="Avatar"
                   className="w-16 h-16 rounded-full object-cover border-2"
                 />

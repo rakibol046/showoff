@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { imgUrl, onImgError } from "@/lib/imageUrl";
 import { useForm } from "react-hook-form";
 import {
   useGetSlidersQuery, useCreateSliderMutation, useUpdateSliderMutation,
@@ -73,7 +74,7 @@ function SliderFormDialog({ open, onOpenChange, editData }) {
               {imagePreview ? (
                 <img src={imagePreview} alt="Preview" className="max-h-32 object-contain rounded" />
               ) : editData?.image ? (
-                <img src={`http://localhost:8080${editData.image}`} alt="Current" className="max-h-32 object-contain rounded" />
+                <img src={imgUrl(editData.image)} alt="Current" onError={onImgError} className="max-h-32 object-contain rounded" />
               ) : (
                 <>
                   <Upload className="w-6 h-6 text-muted-foreground" />
@@ -136,8 +137,9 @@ export default function HeroSlider() {
               <div className="relative h-40 bg-muted">
                 {slider.image ? (
                   <img
-                    src={`http://localhost:8080${slider.image}`}
+                    src={imgUrl(slider.image)}
                     alt={slider.name}
+                    onError={onImgError}
                     className="w-full h-full object-cover"
                   />
                 ) : (

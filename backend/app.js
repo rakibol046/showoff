@@ -10,6 +10,7 @@ const { runSeeder }   = require("./utils/seeder");
 const errorMiddleware = require("./middlewares/error.middleware");
 
 const adminV1Route = require("./api/v1/admin/index");
+const shopV1Route  = require("./api/v1/shop/index");
 const clientRoute  = require("./services/public-api/api");
 
 const app = express();
@@ -28,6 +29,7 @@ app.use((req, _res, next) => {
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use("/api/v1/admin", adminV1Route);
+app.use("/api/v1/shop",  shopV1Route);
 app.use("/api",          clientRoute);
 
 app.get("/health", (_req, res) =>
@@ -52,6 +54,7 @@ app.use(errorMiddleware);
     app.listen(port, () => {
       logger.info(`Server running on port ${port}`);
       logger.info("Admin API  →  /api/v1/admin");
+      logger.info("Shop API   →  /api/v1/shop");
       logger.info("Public API →  /api");
     });
   } catch (err) {

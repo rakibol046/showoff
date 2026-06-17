@@ -7,40 +7,44 @@ import Link from "next/link";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import "swiper/css/scrollbar";
-import { fetchSlider } from "@/api/slider.api";
 
-export default function VerticalSlider({ sliders }) {
+const IMG_BASE = (process.env.NEXT_PUBLIC_API_IMAGE_URL || "").replace(/\/$/, "");
+const IMG_FALLBACK = "/images/default-slide.png";
+
+function getImgSrc(path) {
+  if (!path) return IMG_FALLBACK;
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) return path;
+  return IMG_BASE ? `${IMG_BASE}/${path.replace(/^\//, "")}` : IMG_FALLBACK;
+}
+
+export default function VerticalSlider({ sliders = [] }) {
   return (
     <Swiper
       spaceBetween={0}
-      centeredSlides={true}
-      autoplay={{
-        delay: 5000,
-        disableOnInteraction: false,
-      }}
-      pagination={{
-        clickable: true,
-      }}
-      navigation={true}
+      centeredSlides
+      autoplay={{ delay: 5000, disableOnInteraction: false }}
+      pagination={{ clickable: true }}
+      navigation
       modules={[Autoplay, Pagination, Navigation]}
-      onSwiper={(swiper) => console.log(swiper)}
       className="mySwiper lg:-mt-[85px]"
     >
-      {sliders?.map((slide) => (
+      {sliders.map((slide) => (
         <SwiperSlide key={slide._id}>
-          <Link href={slide.link}>
-            <div className="relative h-[220px] md:h-[350px] lg:h-screen w-full  flex items-center justify-center">
+          <Link href={slide.link || "/"} className="block">
+            <div className="relative h-[220px] md:h-[350px] lg:h-screen w-full">
               <Image
-                src={
-                  slide.image
-                    ? `${process.env.NEXT_PUBLIC_API_IMAGE_URL}${slide.image}`
-                    : "/images/default-slide.png"
-                }
-                alt={slide.name}
+                src={getImgSrc(slide.image)}
+                alt={slide.name || "Slide"}
                 fill
                 priority
-                className="object-cover z-0"
+                sizes="100vw"
+                className="object-cover"
+                onError={(e) => {
+                  if (!e.currentTarget.dataset.errored) {
+                    e.currentTarget.dataset.errored = "1";
+                    e.currentTarget.src = IMG_FALLBACK;
+                  }
+                }}
               />
             </div>
           </Link>

@@ -6,7 +6,11 @@ export const dashboardApi = apiSlice.injectEndpoints({
       query: () => "/dashboard/stats",
       providesTags: ["Dashboard"],
     }),
+    getSalesReport: builder.query({
+      query: () => "/dashboard/sales-report",
+      providesTags: ["SalesReport"],
+    }),
   }),
 });
 
-export const { useGetDashboardStatsQuery } = dashboardApi;
+export const { useGetDashboardStatsQuery, useGetSalesReportQuery } = dashboardApi;

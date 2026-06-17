@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router";
 import { useGetProfileQuery } from "@/features/auth/authApi";
 import { useGetDashboardStatsQuery } from "@/features/dashboard/dashboardApi";
+import { imgUrl, onImgError } from "@/lib/imageUrl";
 
 function Avatar({ name, src }) {
   const initials = name
@@ -15,6 +16,7 @@ function Avatar({ name, src }) {
       <img
         src={src}
         alt={name}
+        onError={onImgError}
         className="w-8 h-8 rounded-full object-cover border"
       />
     );
@@ -38,9 +40,7 @@ const Header = ({ onMenuClick }) => {
 
   const pendingOrders = stats?.orderStats?.pending ?? 0;
   const name = profile?.name || "Admin";
-  const picture = profile?.profile_picture
-    ? `${import.meta.env.VITE_BASE_URL?.replace("/api/v1/admin", "")}${profile.profile_picture}`
-    : null;
+  const picture = profile?.profile_picture ? imgUrl(profile.profile_picture) : null;
 
   return (
     <header className="w-full border-b bg-background shadow-sm flex items-center justify-between px-4 py-3 gap-3 shrink-0">

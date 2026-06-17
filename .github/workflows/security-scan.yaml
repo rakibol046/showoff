@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [backend, client, admin]
+        service: [backend, shop, admin]
 
     steps:
       - uses: actions/checkout@v4

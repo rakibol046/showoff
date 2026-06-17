@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { imgUrl, onImgError } from "@/lib/imageUrl";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { useGetProductsQuery } from "@/features/products/productsApi";
@@ -202,8 +203,9 @@ export default function CreateOrder() {
                   >
                     {product.images?.[0] ? (
                       <img
-                        src={`http://localhost:8080${product.images[0]}`}
+                        src={imgUrl(product.images[0])}
                         alt={product.name}
+                        onError={onImgError}
                         className="w-8 h-8 object-cover rounded border shrink-0"
                       />
                     ) : (
@@ -244,8 +246,9 @@ export default function CreateOrder() {
                         <div className="flex items-center gap-2">
                           {item.images?.[0] ? (
                             <img
-                              src={`http://localhost:8080${item.images[0]}`}
+                              src={imgUrl(item.images[0])}
                               alt={item.name}
+                              onError={onImgError}
                               className="w-8 h-8 object-cover rounded border shrink-0"
                             />
                           ) : (

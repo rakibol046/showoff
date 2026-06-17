@@ -7,7 +7,7 @@ export default function GlobalError({ error, reset }) {
 
   useEffect(() => {
     setMounted(true);
-    console.error(error);
+    if (process.env.NODE_ENV === "development") console.error(error);
   }, [error]);
 
   return (
@@ -68,7 +68,7 @@ export default function GlobalError({ error, reset }) {
               </div>
 
               {/* Error details */}
-              {error?.message && (
+              {process.env.NODE_ENV === "development" && error?.message && (
                 <div className="mb-8 p-4 bg-destructive/10 rounded-lg border border-destructive/20">
                   <p className="text-xs font-mono text-destructive break-all">
                     {error.message}

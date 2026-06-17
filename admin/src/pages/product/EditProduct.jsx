@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { imgUrl, onImgError } from "@/lib/imageUrl";
 import { useNavigate, useParams } from "react-router";
 import { useForm } from "react-hook-form";
 import { useGetProductQuery, useUpdateProductMutation } from "@/features/products/productsApi";
@@ -157,7 +158,7 @@ export default function EditProduct() {
           <div className="flex flex-wrap gap-3">
             {existingImages.map((src, i) => (
               <div key={`ex-${i}`} className="relative w-20 h-20">
-                <img src={`http://localhost:8080${src}`} alt="" className="w-full h-full object-cover rounded-lg border" />
+                <img src={imgUrl(src)} alt="" onError={onImgError} className="w-full h-full object-cover rounded-lg border" />
                 <button type="button" onClick={() => removeExisting(i)} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center">
                   <X className="w-3 h-3" />
                 </button>

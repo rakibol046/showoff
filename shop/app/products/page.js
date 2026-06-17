@@ -1,5 +1,6 @@
-import Image from "next/image";
+import { Suspense } from "react";
 import { fetchProducts } from "@/api/product.api";
+import { fetchParentCategories } from "@/api/category.api";
 import ProductCard from "@/components/product/product-card";
 import ProductsFilter from "@/components/product/products-filter";
 
@@ -10,16 +11,21 @@ export const metadata = {
 
 export default async function Products({ searchParams }) {
   const params = await searchParams;
-  // console.log("Filters:", params);
-  const { data: products } = await fetchProducts(params);
+
+  const [{ products }, categories] = await Promise.all([
+    fetchProducts(params).catch(() => ({ products: [] })),
+    fetchParentCategories().catch(() => []),
+  ]);
 
   return (
     <div className="flex mt-2">
-      <ProductsFilter />
+      <Suspense fallback={<div className="w-full max-w-xs hidden lg:block" />}>
+        <ProductsFilter categories={categories} />
+      </Suspense>
       <div className="px-2 flex-1">
         {products.length === 0 ? (
           <div className="mt-10 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-700">
-            <p className="text-lg font-semibold">There are no products matching your criteria.</p>
+            <p className="text-lg font-semibold">No products match your criteria.</p>
             <p className="mt-2 text-sm text-slate-500">Try adjusting your filters or search criteria.</p>
           </div>
         ) : (

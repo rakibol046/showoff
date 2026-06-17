@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { imgUrl, onImgError } from "@/lib/imageUrl";
 import { useForm } from "react-hook-form";
 import {
   useGetCategoriesQuery,
@@ -169,7 +170,7 @@ function CategoryFormDialog({ open, onOpenChange, editData, allCategories }) {
                 </>
               ) : editData?.logo_url && !logoFile ? (
                 <>
-                  <img src={`http://localhost:8080${editData.logo_url}`} alt="Current" className="h-20 w-20 object-contain rounded" />
+                  <img src={imgUrl(editData.logo_url)} alt="Current" onError={onImgError} className="h-20 w-20 object-contain rounded" />
                   <span className="text-xs text-muted-foreground">Click to replace</span>
                 </>
               ) : (
@@ -225,8 +226,9 @@ function CategoryRow({ cat, depth = 0, onEdit, onDelete, onToggle }) {
             </button>
             {cat.logo_url ? (
               <img
-                src={`http://localhost:8080${cat.logo_url}`}
+                src={imgUrl(cat.logo_url)}
                 alt={cat.name}
+                onError={onImgError}
                 className="w-7 h-7 object-cover rounded border shrink-0"
               />
             ) : (

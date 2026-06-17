@@ -1,14 +1,22 @@
 "use client";
+
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import Image from "next/image";
 import { useRef } from "react";
-
 import "swiper/css";
 import "swiper/css/pagination";
 import Link from "next/link";
+import { symbol } from "@/lib/currency";
+const IMG_BASE = (process.env.NEXT_PUBLIC_API_IMAGE_URL || "").replace(/\/$/, "");
+const IMG_FALLBACK = "/images/default-product.webp";
+function getImgSrc(path) {
+  if (!path) return IMG_FALLBACK;
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) return path;
+  return IMG_BASE ? `${IMG_BASE}/${path.replace(/^\//, "")}` : IMG_FALLBACK;
+}
 
-export default function NewArrival({ products }) {
+export default function NewArrival({ products = [] }) {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 
@@ -19,7 +27,6 @@ export default function NewArrival({ products }) {
       </p>
 
       <div className="relative w-full">
-        {/* Custom Navigation Buttons */}
         <div
           ref={prevRef}
           className="absolute h-10 w-10 text-md md:h-12 md:w-12 flex items-center justify-center md:text-2xl z-10 top-1/2 -translate-y-1/2 left-2 sm:left-4 bg-black/70 text-white p-2 sm:p-3 cursor-pointer rounded-full hover:bg-black transition"
@@ -28,7 +35,7 @@ export default function NewArrival({ products }) {
         </div>
         <div
           ref={nextRef}
-          className="absolute h-10 w-10 text-md md:h-12 md:w-12 flex items-center justify-center md:text-2xl z-10 top-1/2 -translate-y-1/2 right-2 sm:right-4 bg-black/70 text-white p-2 sm:p-3  cursor-pointer rounded-full hover:bg-black transition"
+          className="absolute h-10 w-10 text-md md:h-12 md:w-12 flex items-center justify-center md:text-2xl z-10 top-1/2 -translate-y-1/2 right-2 sm:right-4 bg-black/70 text-white p-2 sm:p-3 cursor-pointer rounded-full hover:bg-black transition"
         >
           →
         </div>
@@ -55,34 +62,21 @@ export default function NewArrival({ products }) {
           }}
         >
           {products.map((product, index) => (
-            <SwiperSlide key={index}>
+            <SwiperSlide key={product._id || index}>
               <div className="group relative w-full aspect-[3/4] rounded overflow-hidden shadow-md">
-                <Link href={`/product/${product.slug}`}>
+                <Link href={`/product/${product.slug}`} className="block relative w-full h-full">
                   <Image
-                    src={
-                      product.images && product.images.length > 0
-                        ? `${process.env.NEXT_PUBLIC_API_IMAGE_URL}${product.images[0]}`
-                        : "/images/default-product.webp"
-                    }
+                    src={getImgSrc(product.image || product.images?.[0])}
                     alt={product.name}
                     fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover"
+                    onError={(e) => { if (!e.currentTarget.dataset.errored) { e.currentTarget.dataset.errored = "1"; e.currentTarget.src = IMG_FALLBACK; } }}
                   />
                 </Link>
-                {/* Overlay visible on hover for md+ and always visible on small */}
-                <div
-                  className="
-                    absolute bottom-0 left-0 w-full px-4 py-3
-                    bg-black/60 text-white  lg:text-base
-                    transition-all duration-500 ease-in-out
-                    lg:translate-y-full lg:opacity-0
-                    group-hover:translate-y-0 group-hover:opacity-100
-                  "
-                >
-                  <p className=" font-medium">{product.name}</p>
-                  <p className="text-sm">
-                    {process.env.NEXT_PUBLIC_CURRENCY} {product.sell_price}
-                  </p>
+                <div className="absolute bottom-0 left-0 w-full px-4 py-3 bg-black/60 text-white lg:text-base transition-all duration-500 ease-in-out lg:translate-y-full lg:opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
+                  <p className="font-medium">{product.name}</p>
+                  <p className="text-sm">{symbol} {product.sell_price}</p>
                 </div>
               </div>
             </SwiperSlide>

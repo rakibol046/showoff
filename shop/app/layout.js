@@ -2,10 +2,10 @@ import { Asul, Poppins } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/common/theme-provider";
 import Header from "@/components/header/header";
+import HeaderMobile from "@/components/header/header-mobile";
 import { ModeToggle } from "@/components/common/mode-toggle";
 import Footer from "@/components/footer/footer";
-import HeaderTop from "@/components/header/header-top";
-import HeaderMobile from "@/components/header/header-mobile";
+import { fetchTopCategories } from "@/api/category.api";
 
 const asul = Asul({
   subsets: ["latin"],
@@ -24,12 +24,14 @@ export const metadata = {
   description: "A e-commerce platform",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const categories = await fetchTopCategories().catch(() => []);
+
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${asul.variable} ${poppins.variable} antialiase`}
+      className={`${asul.variable} ${poppins.variable} antialiased`}
     >
       <body>
         <ThemeProvider
@@ -38,13 +40,9 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          {/* <HeaderTop /> */}
-
-          <Header />
-
-          <HeaderMobile />
-
-          <main> {children}</main>
+          <Header categories={categories} />
+          <HeaderMobile categories={categories} />
+          <main>{children}</main>
           <Footer />
           <div className="actions z-50 fixed bottom-6 right-6">
             <ModeToggle />

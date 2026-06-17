@@ -1,25 +1,21 @@
-import Image from "next/image";
-
 import Slider from "@/components/home/slider";
 import NewArrival from "@/components/home/new-arrival";
-import { fetchSlider } from "@/api/slider.api";
+import CategorySection from "@/components/home/home-category";
+import { fetchSliders } from "@/api/slider.api";
 import { fetchProducts } from "@/api/product.api";
 import { fetchParentCategories } from "@/api/category.api";
-import CategorySection from "@/components/home/home-category";
 
 export default async function Home() {
-  const sliders = await fetchSlider();
-  // console.log("Slider : ", sliders);
-  const { data: products } = await fetchProducts();
-  // console.log("Products : ", products);
-  const parentCategories = await fetchParentCategories();
-  // console.log("Categories : ", parentCategories);
+  const [sliders, { products }, parentCategories] = await Promise.all([
+    fetchSliders().catch(() => []),
+    fetchProducts({ limit: 12 }).catch(() => ({ products: [] })),
+    fetchParentCategories().catch(() => []),
+  ]);
+
   return (
     <div>
       <Slider sliders={sliders} />
-
       <NewArrival products={products} />
-
       <CategorySection categories={parentCategories} />
     </div>
   );

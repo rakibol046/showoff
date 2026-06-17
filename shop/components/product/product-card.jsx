@@ -1,55 +1,57 @@
+"use client";
+
 import Link from "next/link";
-import React from "react";
 import Image from "next/image";
+import { Heart } from "lucide-react";
+import { symbol } from "@/lib/currency";
+import useWishlist from "@/hooks/useWishlist";
+const IMG_BASE = (process.env.NEXT_PUBLIC_API_IMAGE_URL || "").replace(/\/$/, "");
+const IMG_FALLBACK = "/images/default-product.webp";
+function getImgSrc(path) {
+  if (!path) return IMG_FALLBACK;
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) return path;
+  return IMG_BASE ? `${IMG_BASE}/${path.replace(/^\//, "")}` : IMG_FALLBACK;
+}
 
 const ProductCard = ({ product }) => {
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const wished = isInWishlist(product._id);
+
   return (
     <div className="relative group overflow-hidden transition-all duration-300">
-      {/* Image Wrapper with Aspect Ratio */}
       <div className="aspect-[3/4] overflow-hidden relative hover:cursor-pointer">
-        {/* Love Button - visible on card hover, red on icon hover (hidden on mobile) */}
-        <button className="absolute top-3 right-3 z-10 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="black"
-            className="w-6 h-6 hover:cursor-pointer transition-all duration-300 hover:fill-red-500 hover:stroke-red-500"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21.752 7.712a5.4 5.4 0 00-9.352-2.53L12 6.043l-.4-.86a5.4 5.4 0 00-9.352 2.53A5.401 5.401 0 003.6 13.5l8.4 7.45 8.4-7.45a5.401 5.401 0 001.352-5.788z"
-            />
-          </svg>
+        <button
+          onClick={() => toggleWishlist(product)}
+          className="absolute top-3 right-3 z-10 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300"
+          aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart
+            className={`w-6 h-6 transition-all duration-300 ${
+              wished ? "fill-red-500 stroke-red-500" : "stroke-black hover:fill-red-500 hover:stroke-red-500"
+            }`}
+          />
         </button>
 
-        {/* Product Image */}
-        <Link href={`/product/${product.slug}`}>
+        <Link href={`/product/${product.slug}`} className="block relative w-full h-full">
           <Image
-            src={
-              product.images && product.images.length > 0
-                ? `${process.env.NEXT_PUBLIC_API_IMAGE_URL}${product.images[0]}`
-                : "/images/default-product.webp"
-            }
+            src={getImgSrc(product.image || product.images?.[0])}
             alt={product.name}
             fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 20vw"
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={(e) => { if (!e.currentTarget.dataset.errored) { e.currentTarget.dataset.errored = "1"; e.currentTarget.src = IMG_FALLBACK; } }}
           />
         </Link>
 
-        {/* Quick View Overlay - hidden on mobile */}
         <div className="absolute bottom-0 w-full bg-black/60 text-white text-center py-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:block">
           Quick View
         </div>
       </div>
 
-      {/* Product Info */}
       <div className="p-3">
         <h3 className="font-semibold text-center text-sm">{product.name}</h3>
         <p className="text-center text-sm">
-          {process.env.NEXT_PUBLIC_CURRENCY} {product.sell_price}
+          {symbol} {product.sell_price}
         </p>
       </div>
     </div>

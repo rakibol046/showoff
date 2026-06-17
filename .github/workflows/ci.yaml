@@ -28,17 +28,17 @@ jobs:
         run: npm ci
         working-directory: ./backend
 
-      - name: Install client dependencies
+      - name: Install shop dependencies
         run: npm ci
-        working-directory: ./client
+        working-directory: ./shop
 
-      - name: Lint client
+      - name: Lint shop
         run: npm run lint
-        working-directory: ./client
+        working-directory: ./shop
 
-      - name: Build client
+      - name: Build shop
         run: npm run build
-        working-directory: ./client
+        working-directory: ./shop
 
       - name: Install admin dependencies
         run: npm ci

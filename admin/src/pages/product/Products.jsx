@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { imgUrl, onImgError } from "@/lib/imageUrl";
 import { Link } from "react-router";
 import {
   useGetProductsQuery,
@@ -131,8 +132,9 @@ export default function Products() {
                       <td className="px-4 py-3">
                         {product.images?.[0] ? (
                           <img
-                            src={`http://localhost:8080${product.images[0]}`}
+                            src={imgUrl(product.images[0])}
                             alt={product.name}
+                            onError={onImgError}
                             className="w-11 h-11 object-cover rounded-lg border shadow-sm"
                           />
                         ) : (
