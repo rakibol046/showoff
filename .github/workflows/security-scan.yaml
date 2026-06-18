@@ -13,17 +13,18 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         service: [backend, shop, admin]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20.x"
           cache: "npm"
+          cache-dependency-path: ./${{ matrix.service }}/package-lock.json
 
       - name: Install dependencies for ${{ matrix.service }}
         run: npm ci
@@ -32,22 +33,22 @@ jobs:
       - name: Audit dependencies for ${{ matrix.service }}
         run: npm audit --audit-level=moderate
         working-directory: ./${{ matrix.service }}
-        continue-on-error: true
 
   codeql-analysis:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
 
     permissions:
+      contents: read
       security-events: write
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: "javascript"
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3

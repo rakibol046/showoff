@@ -33,6 +33,8 @@ jobs:
           file: ./backend/Dockerfile
           push: false
           tags: showoff-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   build-admin:
     runs-on: ubuntu-latest
@@ -49,6 +51,8 @@ jobs:
           file: ./admin/Dockerfile
           push: false
           tags: showoff-admin:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   build-shop:
     runs-on: ubuntu-latest
@@ -65,3 +69,5 @@ jobs:
           file: ./shop/Dockerfile
           push: false
           tags: showoff-shop:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
