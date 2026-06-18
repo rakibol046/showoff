@@ -7,7 +7,7 @@ const { sendSuccess, sendError } = require("../../../../utils/apiResponse");
 
 exports.getProducts = asyncHandler(async (req, res) => {
   const {
-    name, parentcat, childcat, color, size,
+    name, parentcat, childcat, subcat, color, size,
     min_price, max_price, super_offer,
     page = 1, limit = 20,
   } = req.query;
@@ -43,6 +43,13 @@ exports.getProducts = asyncHandler(async (req, res) => {
     filter.category_id = filter.category_id
       ? { $in: filter.category_id.$in.filter((id) => ids.some((i) => i.equals(id))) }
       : { $in: ids };
+  }
+
+  if (subcat) {
+    const subcatNames = Array.isArray(subcat) ? subcat : [subcat];
+    const subDocs = await Category.find({ name: { $in: subcatNames }, type: 3, status: true });
+    if (!subDocs.length) return sendSuccess(res, [], "Products fetched", { total: 0, page: 1, limit: 20, totalPages: 0 });
+    filter.category_id = { $in: subDocs.map((s) => s._id) };
   }
 
   if (color) {

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { fetchProducts } from "@/api/product.api";
-import { fetchParentCategories } from "@/api/category.api";
+import { fetchCategories } from "@/api/category.api";
 import ProductCard from "@/components/product/product-card";
 import ProductsFilter from "@/components/product/products-filter";
 
@@ -14,7 +14,7 @@ export default async function Products({ searchParams }) {
 
   const [{ products }, categories] = await Promise.all([
     fetchProducts(params).catch(() => ({ products: [] })),
-    fetchParentCategories().catch(() => []),
+    fetchCategories().catch(() => []),
   ]);
 
   return (
