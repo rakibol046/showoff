@@ -10,15 +10,7 @@ import {
 } from "@/components/ui/drawer";
 import useCart from "@/hooks/useCart";
 import { symbol } from "@/lib/currency";
-
-const IMG_BASE = (process.env.NEXT_PUBLIC_API_IMAGE_URL || "").replace(/\/$/, "");
-const IMG_FALLBACK = "/images/default-product.webp";
-function getImgSrc(path) {
-  if (!path) return IMG_FALLBACK;
-  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) return path;
-  return IMG_BASE ? `${IMG_BASE}/${path.replace(/^\//, "")}` : IMG_FALLBACK;
-}
-
+import { getImgSrc } from "@/lib/imageUrl";
 export default function Cart() {
   const { cart, count, total, removeFromCart, updateQty } = useCart();
 
@@ -53,7 +45,7 @@ export default function Cart() {
                     fill
                     sizes="64px"
                     className="object-cover"
-                    onError={(e) => { if (!e.currentTarget.dataset.errored) { e.currentTarget.dataset.errored = "1"; e.currentTarget.src = IMG_FALLBACK; } }}
+                    onError={(e) => { if (!e.currentTarget.dataset.errored) { e.currentTarget.dataset.errored = "1"; e.currentTarget.src = getImgSrc(null); } }}
                   />
                 </div>
                 <div className="flex-1 min-w-0">

@@ -8,13 +8,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import Link from "next/link";
 import { symbol } from "@/lib/currency";
-const IMG_BASE = (process.env.NEXT_PUBLIC_API_IMAGE_URL || "").replace(/\/$/, "");
-const IMG_FALLBACK = "/images/default-product.webp";
-function getImgSrc(path) {
-  if (!path) return IMG_FALLBACK;
-  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) return path;
-  return IMG_BASE ? `${IMG_BASE}/${path.replace(/^\//, "")}` : IMG_FALLBACK;
-}
+import { getImgSrc } from "@/lib/imageUrl";
 
 export default function NewArrival({ products = [] }) {
   const prevRef = useRef(null);
@@ -71,7 +65,7 @@ export default function NewArrival({ products = [] }) {
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover"
-                    onError={(e) => { if (!e.currentTarget.dataset.errored) { e.currentTarget.dataset.errored = "1"; e.currentTarget.src = IMG_FALLBACK; } }}
+                    onError={(e) => { if (!e.currentTarget.dataset.errored) { e.currentTarget.dataset.errored = "1"; e.currentTarget.src = getImgSrc(null); } }}
                   />
                 </Link>
                 <div className="absolute bottom-0 left-0 w-full px-4 py-3 bg-black/60 text-white lg:text-base transition-all duration-500 ease-in-out lg:translate-y-full lg:opacity-0 group-hover:translate-y-0 group-hover:opacity-100">

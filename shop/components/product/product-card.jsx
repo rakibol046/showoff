@@ -5,14 +5,7 @@ import Image from "next/image";
 import { Heart } from "lucide-react";
 import { symbol } from "@/lib/currency";
 import useWishlist from "@/hooks/useWishlist";
-const IMG_BASE = (process.env.NEXT_PUBLIC_API_IMAGE_URL || "").replace(/\/$/, "");
-const IMG_FALLBACK = "/images/default-product.webp";
-function getImgSrc(path) {
-  if (!path) return IMG_FALLBACK;
-  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) return path;
-  return IMG_BASE ? `${IMG_BASE}/${path.replace(/^\//, "")}` : IMG_FALLBACK;
-}
-
+import { getImgSrc } from "@/lib/imageUrl";
 const ProductCard = ({ product }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const wished = isInWishlist(product._id);
@@ -39,7 +32,7 @@ const ProductCard = ({ product }) => {
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 20vw"
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            onError={(e) => { if (!e.currentTarget.dataset.errored) { e.currentTarget.dataset.errored = "1"; e.currentTarget.src = IMG_FALLBACK; } }}
+            onError={(e) => { if (!e.currentTarget.dataset.errored) { e.currentTarget.dataset.errored = "1"; e.currentTarget.src = getImgSrc(null); } }}
           />
         </Link>
 
