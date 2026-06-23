@@ -7,8 +7,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    env_file:
-      - ./backend/.env
     volumes:
       - ./backend:/app
       - backend_node_modules:/app/node_modules
@@ -33,21 +31,21 @@ services:
       - showoff-network
     restart: unless-stopped
 
-  # Client Frontend (Next.js)
-  client:
-    container_name: showoff-client
+  # Shop Frontend (Next.js)
+  shop:
+    container_name: showoff-shop
     build:
-      context: ./client
+      context: ./shop
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
       - backend
-    environment:
-      - NEXT_PUBLIC_API_BASE_URL=http://backend:8080/api
+    env_file:
+      - ./shop/.env
     volumes:
-      - ./client:/app
-      - client_node_modules:/app/node_modules
+      - ./shop:/app
+      - shop_node_modules:/app/node_modules
     networks:
       - showoff-network
     restart: unless-stopped
@@ -55,7 +53,7 @@ services:
 volumes:
   backend_node_modules:
   admin_node_modules:
-  client_node_modules:
+  shop_node_modules:
 
 networks:
   showoff-network:

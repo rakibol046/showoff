@@ -1,11 +1,9 @@
 import { apiSlice } from "../api/apiSlice";
 import { adminLogIn } from "../auth/authSlice";
+import { toast } from "sonner";
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getUser: builder.query({
-      query: () => "/category/parent/all",
-    }),
     signIn: builder.mutation({
       query: (data) => ({
         url: "/auth/signin",
@@ -14,27 +12,55 @@ export const authApi = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
-          const result = await queryFulfilled;
+          const { data } = await queryFulfilled;
+          // data is { accessToken, admin, expiresIn } after envelope unwrap
+          const payload = { accessToken: data.accessToken, admin: data.admin };
+          localStorage.setItem("auth", JSON.stringify(payload));
+          dispatch(adminLogIn(payload));
+          toast.success("Logged in successfully");
+        } catch {}
+      },
+    }),
 
-          localStorage.setItem(
-            "auth",
-            JSON.stringify({
-              accessToken: result.data.accessToken,
-              admin: result.data.admin,
-            })
-          );
+    getProfile: builder.query({
+      query: () => "/auth/profile",
+      providesTags: ["Profile"],
+    }),
 
-          dispatch(
-            adminLogIn({
-              accessToken: result.data.accessToken,
-              admin: result.data.admin,
-            })
-          );
-        } catch (error) {}
+    updateProfile: builder.mutation({
+      query: (formData) => ({
+        url: "/auth/profile",
+        method: "PATCH",
+        body: formData,
+      }),
+      invalidatesTags: ["Profile"],
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          toast.success("Profile updated");
+        } catch {}
+      },
+    }),
+
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: "/auth/password",
+        method: "PATCH",
+        body: data,
+      }),
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          toast.success("Password changed successfully");
+        } catch {}
       },
     }),
   }),
 });
 
-// Export the hook to use in components
-export const { useGetUserQuery, useSignInMutation } = authApi;
+export const {
+  useSignInMutation,
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useChangePasswordMutation,
+} = authApi;

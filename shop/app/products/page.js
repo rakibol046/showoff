@@ -1,0 +1,41 @@
+import { Suspense } from "react";
+import { fetchProducts } from "@/api/product.api";
+import { fetchCategories } from "@/api/category.api";
+import ProductCard from "@/components/product/product-card";
+import ProductsFilter from "@/components/product/products-filter";
+
+export const metadata = {
+  title: "Products | ShowOff",
+  description: "A e-commerce platform",
+};
+
+export default async function Products({ searchParams }) {
+  const params = await searchParams;
+
+  const [{ products }, categories] = await Promise.all([
+    fetchProducts(params).catch(() => ({ products: [] })),
+    fetchCategories().catch(() => []),
+  ]);
+
+  return (
+    <div className="flex mt-2">
+      <Suspense fallback={<div className="w-full max-w-xs hidden lg:block" />}>
+        <ProductsFilter categories={categories} />
+      </Suspense>
+      <div className="px-2 flex-1">
+        {products.length === 0 ? (
+          <div className="mt-10 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-700">
+            <p className="text-lg font-semibold">No products match your criteria.</p>
+            <p className="mt-2 text-sm text-slate-500">Try adjusting your filters or search criteria.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2">
+            {products.map((prod) => (
+              <ProductCard key={prod._id} product={prod} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

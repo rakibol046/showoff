@@ -47,8 +47,9 @@ const orderSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Customer",
     },
-    receiver_name: { type: String, default: null },
-    receiver_phone: { type: String, default: null },
+    receiver_name: { type: String, required: true },
+    receiver_phone: { type: String, required: true},
+    receiver_email: { type: String, default: null },
     receiver_location: { type: String, default: null },
 
     order_date: { type: String, default: null },
