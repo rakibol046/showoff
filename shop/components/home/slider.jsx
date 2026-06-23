@@ -7,16 +7,7 @@ import Link from "next/link";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
-const IMG_BASE = (process.env.NEXT_PUBLIC_API_IMAGE_URL || "").replace(/\/$/, "");
-const IMG_FALLBACK = "/images/default-slide.png";
-
-function getImgSrc(path) {
-  if (!path) return IMG_FALLBACK;
-  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) return path;
-  return IMG_BASE ? `${IMG_BASE}/${path.replace(/^\//, "")}` : IMG_FALLBACK;
-}
-
+import { getImgSrc } from "@/lib/imageUrl";
 export default function VerticalSlider({ sliders = [] }) {
   return (
     <Swiper
@@ -42,7 +33,7 @@ export default function VerticalSlider({ sliders = [] }) {
                 onError={(e) => {
                   if (!e.currentTarget.dataset.errored) {
                     e.currentTarget.dataset.errored = "1";
-                    e.currentTarget.src = IMG_FALLBACK;
+                    e.currentTarget.src = getImgSrc(null);
                   }
                 }}
               />

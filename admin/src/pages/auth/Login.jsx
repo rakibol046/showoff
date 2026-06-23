@@ -24,7 +24,12 @@ export default function Login({ className, ...props }) {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm();
+  } = useForm({
+  defaultValues: {
+    email: "admin@showoff.com",
+    password: "admin",
+  },
+});
   useEffect(() => {
     if (resError) {
       console.log(resError);
@@ -68,7 +73,7 @@ export default function Login({ className, ...props }) {
                       })}
                       id="email"
                       type="email"
-                      placeholder="m@example.com"
+                      placeholder="admin@example.com"
                       required
                     />
                   </div>
