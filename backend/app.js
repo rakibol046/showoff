@@ -11,40 +11,39 @@ const errorMiddleware = require("./middlewares/error.middleware");
 
 const adminV1Route = require("./api/v1/admin/index");
 const shopV1Route  = require("./api/v1/shop/index");
-const clientRoute  = require("./services/public-api/api");
 
 const app = express();
 
-// ── Middleware ────────────────────────────────────────────────────────────────
+//Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Request logger
+//Request logger
 app.use((req, _res, next) => {
   logger.http(`${req.method} ${req.url}`);
   next();
 });
 
-// ── Routes ────────────────────────────────────────────────────────────────────
+//Routes
 app.use("/api/v1/admin", adminV1Route);
 app.use("/api/v1/shop",  shopV1Route);
-app.use("/api",          clientRoute);
+
 
 app.get("/health", (_req, res) =>
   res.json({ success: true, message: "Server is healthy" })
 );
 
-// ── 404 ───────────────────────────────────────────────────────────────────────
+//404
 app.use((_req, res) =>
   res.status(404).json({ success: false, message: "Route not found" })
 );
 
-// ── Centralized error handler (must be last) ──────────────────────────────────
+//Centralized error handler (must be last) 
 app.use(errorMiddleware);
 
-// ── Bootstrap ─────────────────────────────────────────────────────────────────
+//Bootstrap the server
 (async () => {
   try {
     await connect();

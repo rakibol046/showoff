@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api";
+import { apiFetch } from "@/api/api";
 
 export async function fetchProducts(filters = {}) {
   const params = new URLSearchParams();

@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api";
+import { apiFetch } from "@/api/api";
 
 export async function placeOrder(body, token = null) {
   const { data } = await apiFetch("/orders", {

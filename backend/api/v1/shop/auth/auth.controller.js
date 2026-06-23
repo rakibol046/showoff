@@ -8,6 +8,7 @@ const signToken = (id, phone) =>
   jwt.sign({ id, phone }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
 exports.register = asyncHandler(async (req, res) => {
+  console.log("Registering customer with data:", req.body);
   const { name, phone, email, password } = req.body;
   if (!name || !phone || !password) return sendError(res, 400, "Name, phone, and password are required");
 
