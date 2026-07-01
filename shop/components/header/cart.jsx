@@ -39,7 +39,9 @@ export default function Cart() {
             cart.map((item) => (
               <div key={item.key} className="flex gap-3 items-start border-b pb-3">
                 <div className="w-16 h-16 relative shrink-0 rounded overflow-hidden border bg-muted">
-                  <Image
+                 
+                   <Link href={`/product/${item.slug}`}>
+                    <Image
                     src={getImgSrc(item.image)}
                     alt={item.name}
                     fill
@@ -47,9 +49,12 @@ export default function Cart() {
                     className="object-cover"
                     onError={(e) => { if (!e.currentTarget.dataset.errored) { e.currentTarget.dataset.errored = "1"; e.currentTarget.src = getImgSrc(null); } }}
                   />
+                  </Link>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{item.name}</p>
+                  <Link href={`/product/${item.slug}`} className="text-sm font-medium truncate">
+                    {item.name}
+                  </Link>
                   {item.color && <p className="text-xs text-muted-foreground">Color: {item.color}</p>}
                   {item.size && <p className="text-xs text-muted-foreground">Size: {item.size}</p>}
                   <p className="text-sm font-semibold mt-1">{symbol}{(item.sell_price * item.quantity).toFixed(2)}</p>

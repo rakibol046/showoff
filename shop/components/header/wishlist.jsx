@@ -41,7 +41,9 @@ export default function Wishlist() {
             wishlist.map((item) => (
               <div key={item._id} className="flex gap-3 items-start border-b pb-3">
                 <div className="w-16 h-16 relative shrink-0 rounded overflow-hidden border bg-muted">
-                  <Image
+                
+                   <Link href={`/product/${item.slug}`}>
+                   <Image
                     src={getImgSrc(item.image)}
                     alt={item.name}
                     fill
@@ -49,14 +51,18 @@ export default function Wishlist() {
                     className="object-cover"
                     onError={(e) => { if (!e.currentTarget.dataset.errored) { e.currentTarget.dataset.errored = "1"; e.currentTarget.src = getImgSrc(null); } }}
                   />
+                  </Link>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{item.name}</p>
+                   <Link href={`/product/${item.slug}`} className="text-sm font-medium truncate">
+                    {item.name}
+                  </Link>
                   <p className="text-sm font-semibold mt-1">{symbol}{item.sell_price?.toFixed(2)}</p>
                 </div>
                 <button onClick={() => removeFromWishlist(item._id)} className="text-muted-foreground hover:text-red-500 shrink-0 mt-1">
                   <Trash2 className="w-4 h-4" />
                 </button>
+                
               </div>
             ))
           )}
