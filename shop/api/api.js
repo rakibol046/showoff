@@ -1,5 +1,4 @@
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-console.log("API Base URL:", BASE);
 
 export async function apiFetch(path, { next, cache, headers, ...opts } = {}) {
   const url = `${BASE}${path}`;
