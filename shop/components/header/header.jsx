@@ -46,7 +46,7 @@ export default function Header({ categories = [] }) {
 
         <div className="flex gap-5 items-center">
           <Search className="cursor-pointer" />
-          <Link href="/auth/login"><UserRound className="cursor-pointer" /></Link>
+          <Link href="/user/dashboard"><UserRound className="cursor-pointer" /></Link>
           <Wishlist />
           <Cart />
         </div>

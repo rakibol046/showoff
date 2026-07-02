@@ -6,6 +6,7 @@ import HeaderMobile from "@/components/header/header-mobile";
 import { ModeToggle } from "@/components/common/mode-toggle";
 import Footer from "@/components/footer/footer";
 import { fetchTopCategories } from "@/api/category.api";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const asul = Asul({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ export default async function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
+           <ScrollToTop />
           <Header categories={categories} />
           <HeaderMobile categories={categories} />
           <main>{children}</main>

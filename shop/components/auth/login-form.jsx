@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginCustomer } from "@/api/auth.api";
-import { AUTH_TOKEN_KEY } from "@/lib/constants";
+import { AUTH_TOKEN_KEY, CUSTOMER_STORAGE_KEY } from "@/lib/constants";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -23,9 +23,11 @@ export default function LoginForm() {
     setError(null);
     setLoading(true);
     try {
-      const { token } = await loginCustomer(form);
+      const { token, customer } = await loginCustomer(form);
+      console.log("Login successful, token:", token);
       localStorage.setItem(AUTH_TOKEN_KEY, token);
-      router.push("/");
+      localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(customer));
+      router.push("/user/dashboard");
     } catch (err) {
       setError(err.message || "Invalid credentials.");
     } finally {

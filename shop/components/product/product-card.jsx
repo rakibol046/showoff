@@ -6,6 +6,7 @@ import { Heart } from "lucide-react";
 import { symbol } from "@/lib/currency";
 import useWishlist from "@/hooks/useWishlist";
 import { getImgSrc } from "@/lib/imageUrl";
+import { Badge } from "@/components/ui/badge";
 const ProductCard = ({ product }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const wished = isInWishlist(product._id);
@@ -13,6 +14,12 @@ const ProductCard = ({ product }) => {
   return (
     <div className="relative group overflow-hidden transition-all duration-300">
       <div className="aspect-[3/4] overflow-hidden relative hover:cursor-pointer">
+       {product?.discount > 0 && (
+          <Badge className="absolute top-4 left-4 bg-red-500 text-white z-10">
+            -{product?.discount}% OFF
+          </Badge>
+        )}
+
         <button
           onClick={() => toggleWishlist(product)}
           className="absolute top-3 right-3 z-10 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300"
